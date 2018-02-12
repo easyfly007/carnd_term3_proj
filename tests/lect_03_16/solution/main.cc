@@ -9,7 +9,7 @@ using namespace std;
 vector<vector<double> > Load_State(string file_name)
 {
     ifstream in_state_(file_name.c_str(), ifstream::in);
-    vector< vector<double >> state_out;
+    vector< vector<double > > state_out;
     string line;
     
     
@@ -21,7 +21,7 @@ vector<vector<double> > Load_State(string file_name)
     	string token;
     	while( getline(iss,token,','))
     	{
-    	    x_coord.push_back(stod(token));
+    	    x_coord.push_back(std::stod(token));
     	}
     	state_out.push_back(x_coord);
     }

@@ -12,9 +12,13 @@ GNB::GNB() {
 
 }
 
-GNB::~GNB() {}
+GNB::~GNB() {
+	possible_labels.push_back(string("left"));
+	possible_labels.push_back(string("keep"));
+	possible_labels.push_back(string("right"));
+}
 
-void GNB::train(vector<vector<double>> data, vector<string> labels)
+void GNB::train(vector<vector<double> > data, vector<string> labels)
 {
 
 	/*

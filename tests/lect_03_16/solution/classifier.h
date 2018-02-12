@@ -5,13 +5,14 @@
 #include <fstream>
 #include <math.h>
 #include <vector>
+#include <string>
 
 using namespace std;
 
 class GNB {
 public:
 
-	vector<string> possible_labels = {"left","keep","right"};
+	vector<string> possible_labels;
 
 
 	/**
