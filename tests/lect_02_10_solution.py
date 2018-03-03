@@ -20,6 +20,12 @@ grid = [[0, 0, 1, 0, 0, 0],
         [0, 0, 0, 0, 1, 0],
         [0, 0, 1, 1, 1, 0],
         [0, 0, 0, 0, 1, 0]]
+grid = [[0, 0, 1, 0, 0, 0],
+        [0, 0, 1, 0, 0, 0],
+        [0, 0, 1, 0, 1, 0],
+        [0, 0, 1, 1, 1, 0],
+        [0, 0, 0, 0, 1, 0]]
+
 init = [0, 0]
 goal = [len(grid)-1, len(grid[0])-1]
 print(goal)
@@ -77,4 +83,7 @@ def search(grid,init,goal,cost):
             break
     return path
 path = search(grid,init,goal,cost)
-print(path)
+if path == None:
+    print('fail')
+else:
+    print(path)
