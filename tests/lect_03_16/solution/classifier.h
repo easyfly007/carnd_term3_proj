@@ -29,6 +29,13 @@ public:
 
   	string predict(vector<double>);
 
+ private:
+ 	vector<double> p_labels;
+ 	vector<vector<vector<double> > > p_X_over_Y;
+ 	// first level vec for each Y label type, which has size 3
+ 	// second level vec for each X features, which has size 4
+ 	// third level vec for mean and std for gaussion distribution for the specific Y lable and X feature
+
 };
 
 #endif
