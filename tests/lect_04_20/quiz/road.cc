@@ -34,16 +34,14 @@ void Road::populate_traffic() {
 	{
 		int lane_speed = this->lane_speeds[l];
 		bool vehicle_just_added = false;
-		for(int s = start_s; s < start_s+this->update_width; s++)
+		for(int s = start_s; s < start_s + this->update_width; s++)
 		{
-			
 			if(vehicle_just_added)
 			{
 				vehicle_just_added = false;
 			}
 			if(((double) rand() / (RAND_MAX)) < this->density)
 			{
-				
 				Vehicle vehicle = Vehicle(l,s,lane_speed,0);
 				vehicle.state = "CS";
 				this->vehicles_added += 1;
@@ -76,7 +74,8 @@ void Road::advance() {
         	vector<Vehicle> trajectory = it->second.choose_next_state(predictions);
         	it->second.realize_next_state(trajectory);
         }
-        else {
+        else 
+        {
             it->second.increment(1);
         }
         it++;
@@ -190,9 +189,5 @@ void Road::display(int timestep) {
         oss << "|";
         oss << "\n";
     }
-    
     cout << oss.str();
-
 }
-
-
