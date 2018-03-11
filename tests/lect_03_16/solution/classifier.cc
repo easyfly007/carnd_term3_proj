@@ -79,7 +79,7 @@ void GNB::train(vector<vector<double> > data, vector<string> labels)
 
 
 	for (int label_idx = 0; label_idx < label_cnt; label_idx ++)
-		p_labels[label_idx] = float(data_cnt_by_label[label_idx]/ float(data_cnt);
+		p_labels[label_idx] = float(data_cnt_by_label[label_idx])/ float(data_cnt);
 
 	// update means
 	for (int feat_idx = 0; feat_idx < feat_cnt; feat_idx ++)
@@ -99,10 +99,9 @@ void GNB::train(vector<vector<double> > data, vector<string> labels)
 				for (int feat_idx = 0; feat_idx < feat_cnt; feat_idx ++)
 				{
 					double mean = p_X_over_Y[label_idx][feat_idx][0];
-					double std = (data_points[i] - mean) * (data_points[i] - mean);
+					double std = (data[data_idx][feat_idx] - mean) * (data[data_idx][feat_idx] - mean);
+					p_X_over_Y[label_idx][feat_idx][1] += std;
 				}
-				double mean = std += (data_points[i] - mean) * (data_points[i] - mean);
-				p_X_over_Y[label_idx][feat_idx][1] += mean;
 				break;
 			}
 		}
@@ -113,6 +112,7 @@ void GNB::train(vector<vector<double> > data, vector<string> labels)
 		for (int feat_idx = 0; feat_idx < feat_cnt; feat_idx ++)
 			p_X_over_Y[label_idx][feat_idx][1] /= data_cnt_by_label[label_idx];
 	}
+}
 
 string GNB::predict(vector<double> sample)
 {
