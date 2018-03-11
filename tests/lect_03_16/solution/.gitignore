@@ -1,0 +1,5 @@
+CMakeFiles/*
+out
+*.cmake
+Makefile
+CMakeCache.txt
