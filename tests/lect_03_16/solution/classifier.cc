@@ -9,15 +9,6 @@
 /**
  * Initializes GNB
  */
-// vector<double> data_points = get_value_by_ylabel_by_xfeature(vector<vector<double> > & data , vector<string> labels &,
-// 	int label_idx, int feat_idx, vector<string> possible_labels &);
-
-vector<double> get_value_by_ylabel_by_xfeature(vector<vector<double> > & data, vector<string> & labels,
-	int label_idx, int feat_idx, vector<string> & possible_labels){
-	vector<double> data_points;
-
-	return data_points;
-}
 
 GNB::GNB() {
 	possible_labels.push_back(string("left"));
@@ -32,6 +23,7 @@ GNB::GNB() {
 GNB::~GNB() {
 
 }
+
 
 void GNB::train(vector<vector<double> > data, vector<string> labels)
 {
@@ -52,62 +44,75 @@ void GNB::train(vector<vector<double> > data, vector<string> labels)
 		labels - array of N labels
 		  - Each label is one of "left", "keep", or "right".
 	*/
-	int data_size = data.size();
-	int feat_size = data[0].size();
+	int data_cnt = data.size();
+	int feat_cnt = data[0].size();
 
-	vector<int> cnt_by_label(3, 0);
-
-	for (int i = 0; i < data_size; i ++)
+	int label_cnt = 3;
+	vector<int> data_cnt_by_label(label_cnt, 0);
+	for (int label_idx = 0; label_idx < label_cnt; label_idx ++)
 	{
-		string label = labels[i];
-		for (int j = 0; j < possible_labels.size(); j ++)
-		{
-			if (label == possible_labels[j])
-			{
-				cnt_by_label[j] ++;
-				break;
-			}
-		}
-	}
-
-	for (int i = 0; i < p_labels.size(); i ++)
-	{
-		p_labels[i] = float(cnt_by_label[i]) / float(data_size);
-	}
-
-
-	// calc p(X| Y)
-	for (int label_idx = 0 ; label_idx < possible_labels.size(); label_idx ++)
-	{
-		vector<vector<double> > dist_params_by_feature;
-
-		for (int feat_idx = 0; feat_idx < feat_size; feat_idx ++)
+		vector<vector<double> >  dist_params_by_feature;
+		for (int feat_idx = 0; feat_idx < feat_cnt; feat_idx ++)
 		{
 			vector<double> dist_params;
-			double mean, std;
-			vector<double> data_points = get_value_by_ylabel_by_xfeature(data, labels, label_idx, feat_idx, possible_labels);
-			double sum = 0.0;
-			for (int i = 0; i < data_points.size(); i ++)
-			{
-				sum += data_points[i];
-			}
-			mean = sum / data_points.size();
-			
-			std = 0.0;
-			for (int i = 0; i < data_points.size(); i ++)
-			{
-				std += (data_points[i] - mean) * (data_points[i] - mean);
-			}
-			std /= data_points.size();
-			dist_params.push_back(mean);
-			dist_params.push_back(std);
+			dist_params.push_back(0.); // to save mean 
+			dist_params.push_back(0.); // to save std
 			dist_params_by_feature.push_back(dist_params);
 		}
 		p_X_over_Y.push_back(dist_params_by_feature);
 	}
 
+	for (int data_idx = 0; data_idx < data_cnt; data_idx ++)
+	{
+		string label = labels[data_idx];
+		for (int label_idx = 0; label_idx < label_cnt; label_idx ++)
+		{
+			if (label == possible_labels[label_idx])
+			{
+				data_cnt_by_label[label_idx] ++;
+				for (int feat_idx = 0; feat_idx < feat_cnt; feat_idx ++)
+					p_X_over_Y[label_idx][feat_idx][0] += data[data_idx][feat_idx];
+				break;
+			}
+		}
+	}
 
-}
+
+	for (int label_idx = 0; label_idx < label_cnt; label_idx ++)
+		p_labels[label_idx] = float(data_cnt_by_label[label_idx]/ float(data_cnt);
+
+	// update means
+	for (int feat_idx = 0; feat_idx < feat_cnt; feat_idx ++)
+	{
+		for (int label_idx = 0; label_idx < label_cnt; label_idx ++)
+			p_X_over_Y[label_idx][feat_idx][0] /= float(data_cnt_by_label[label_idx]);
+	}
+
+	// add sum of std
+	for (int data_idx = 0; data_idx < data_cnt; data_idx ++)
+	{
+		string label = labels[data_idx];
+		for (int label_idx = 0; label_idx < label_cnt; label_idx ++)
+		{
+			if (possible_labels[label_idx] == label)
+			{
+				for (int feat_idx = 0; feat_idx < feat_cnt; feat_idx ++)
+				{
+					double mean = p_X_over_Y[label_idx][feat_idx][0];
+					double std = (data_points[i] - mean) * (data_points[i] - mean);
+				}
+				double mean = std += (data_points[i] - mean) * (data_points[i] - mean);
+				p_X_over_Y[label_idx][feat_idx][1] += mean;
+				break;
+			}
+		}
+	}
+
+	for (int label_idx = 0; label_idx < label_cnt; label_idx ++)
+	{
+		for (int feat_idx = 0; feat_idx < feat_cnt; feat_idx ++)
+			p_X_over_Y[label_idx][feat_idx][1] /= data_cnt_by_label[label_idx];
+	}
 
 string GNB::predict(vector<double> sample)
 {
