@@ -3,3 +3,4 @@ out
 *.cmake
 Makefile
 CMakeCache.txt
+build/*
