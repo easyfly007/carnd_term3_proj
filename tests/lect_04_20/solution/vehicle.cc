@@ -48,12 +48,30 @@ vector<Vehicle> Vehicle::choose_next_state(map<int, vector<Vehicle>> predictions
     3. calculate_cost(Vehicle vehicle, map<int, vector<Vehicle>> predictions, vector<Vehicle> trajectory) - Included from 
        cost.cpp, computes the cost for a trajectory.
     */
+    vector<string> next_possible_states = successor_states();
     
-    //TODO: Your solution here.
-    
-    //TODO: Change return value here:
-    return generate_trajectory("KL", predictions);
+    double min_cost = -1.0;
+    vector<Vehicle> best_trajectory;
+    string best_next_state;
+    for (std::vector<string>::const_iterator it = next_possible_states.begin();
+        it != next_possible_states.end(); it ++)
+    {
+        vector<Vehicle> trajectory = generate_trajectory("KL", predictions);
+        double cost = 0.0;
+        for (vectors<Vehicle>::const_iterator it_v = trajectory.begin();
+            it_v != trajectory.end(); it_v ++)
+        {
+            cost += calculate_cost(vehicle, predictions, trajectory);
+        }
+        if (min_cost < 0.0 || cost < min_cost)
+        {
+            min_cost = trajectory;
+            best_trajectory = trajectory;
+        }
+    }
+    return best_trajectory;
 }
+
 
 vector<string> Vehicle::successor_states() {
     /*
@@ -218,7 +236,7 @@ float Vehicle::position_at(int t) {
     return this->s + this->v*t + this->a*t*t/2.0;
 }
 
-bool Vehicle::get_vehicle_behind(map<int, vector<Vehicle>> predictions, int lane, Vehicle & rVehicle) {
+bool Vehicle::get_vehicle_behind(map<int, vector<Vehicle> > predictions, int lane, Vehicle & rVehicle) {
     /*
     Returns a true if a vehicle is found behind the current vehicle, false otherwise. The passed reference
     rVehicle is updated if a vehicle is found.
