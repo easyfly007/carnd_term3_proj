@@ -7,8 +7,8 @@
 
 
 //TODO: change weights for cost functions.
-const float REACH_GOAL = 0;
-const float EFFICIENCY = 0;
+const float REACH_GOAL = 1.;
+const float EFFICIENCY = 1.;
 
 /*
 Here we have provided two possible suggestions for cost functions, but feel free to use your own!
@@ -80,7 +80,8 @@ float calculate_cost(const Vehicle & vehicle, const map<int, vector<Vehicle>> & 
     float cost = 0.0;
 
     //Add additional cost functions here.
-    vector< function<float(const Vehicle & , const vector<Vehicle> &, const map<int, vector<Vehicle>> &, map<string, float> &)>> cf_list = {goal_distance_cost, inefficiency_cost};
+    vector< function<float(const Vehicle & , const vector<Vehicle> &, const map<int, vector<Vehicle>> &, map<string, float> &)>> cf_list
+     = {goal_distance_cost, inefficiency_cost};
     vector<float> weight_list = {REACH_GOAL, EFFICIENCY};
     
     for (int i = 0; i < cf_list.size(); i++) {

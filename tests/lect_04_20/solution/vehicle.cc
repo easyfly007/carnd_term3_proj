@@ -56,16 +56,16 @@ vector<Vehicle> Vehicle::choose_next_state(map<int, vector<Vehicle>> predictions
     for (std::vector<string>::const_iterator it = next_possible_states.begin();
         it != next_possible_states.end(); it ++)
     {
-        vector<Vehicle> trajectory = generate_trajectory("KL", predictions);
+        vector<Vehicle> trajectory = generate_trajectory(*it, predictions);
         double cost = 0.0;
-        for (vectors<Vehicle>::const_iterator it_v = trajectory.begin();
+        for (vector<Vehicle>::const_iterator it_v = trajectory.begin();
             it_v != trajectory.end(); it_v ++)
         {
-            cost += calculate_cost(vehicle, predictions, trajectory);
+            cost += calculate_cost(*this, predictions, trajectory);
         }
         if (min_cost < 0.0 || cost < min_cost)
         {
-            min_cost = trajectory;
+            min_cost = cost;
             best_trajectory = trajectory;
         }
     }
