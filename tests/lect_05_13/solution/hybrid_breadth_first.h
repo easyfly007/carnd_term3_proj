@@ -22,6 +22,7 @@ public:
 		double x;
 		double y;
 		double theta;
+		int f; // f = g + h
 	};
 
 	struct maze_path {
@@ -32,11 +33,14 @@ public:
 
 	};
 
+	double goalx;
+	double goaly;
+
 
 	/**
   	* Constructor
   	*/
- 	HBF();
+ 	HBF(double x, double y);
 
 	/**
  	* Destructor
@@ -47,6 +51,7 @@ public:
  	int theta_to_stack_number(double theta);
 
   	int idx(double float_num);
+  	double h(double x, double y);
 
   	vector<maze_s> expand(maze_s state);
 
