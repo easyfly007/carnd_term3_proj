@@ -35,7 +35,34 @@ vector<double> JMT(vector< double> start, vector <double> end, double T)
     > JMT( [0, 10, 0], [10, 10, 0], 1)
     [0.0, 10.0, 0.0, 0.0, 0.0, 0.0]
     */
-    return {1,2,3,4,5,6};
+    double si0 = start[0];
+    double si1 = start[1];
+    double si2 = start[2];
+    double st0 = target[0];
+    double st1 = target[1];
+    double st2 = target[2];
+
+    double a0 = si0;
+    double a1 = si1;
+    double a2 = 0.5 * si2;
+    double a[3][3] = {
+    	{1 * T**3, 1 * T**4, 1 * T**5},
+    	{3 * T**2, 4 * T**3, 5 * T**4},
+    	{6 * T**1, 12 * T**2, 20 * T**3},}
+    MatrixXd a(3,3);
+    a <<  1 * T**3, 1 * T**4, 1 * T**5,
+    	3 * T**2, 4 * T**3, 5 * T**4,
+    	6 * T**1, 12 * T**2, 20 * T**3 ;
+    a = a.inverse();
+    MatrixXd b(3, 1);
+    b << st0 - a0 - a1 * T - a2 * T * T,
+    	st1 - a1 - 2 * a2 * T,
+    	st2 - 2 * a2;
+    MatrixXd c = a * b;
+    a3 = c[0,0];
+    a4 = c[1,0];
+    a5 = c[2,0]; 
+    return {a0, a1, a2, a3, a4, a5};
     
 }
 
