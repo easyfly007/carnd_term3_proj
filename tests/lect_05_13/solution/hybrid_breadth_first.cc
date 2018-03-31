@@ -6,16 +6,38 @@
 #include "hybrid_breadth_first.h"
 
 using namespace std;
-
+extern vector<vector<int> > GRID_expansion;
 
 /**
  * Initializes HBF
  */
-HBF::HBF() {
-
+HBF::HBF(double x, double y){
+  goalx = x;
+  goaly = y;
 }
 
 HBF::~HBF() {}
+void rearrange_state_vec(vector<HBF::maze_s> &statevec)
+{
+  double min_f = -1;
+  int min_i = -1;
+  int siz = statevec.size();
+  for (int i = 0; i < siz; i ++)
+  {
+    double f = statevec[i].f;
+    if (min_i == -1 || f < min_f)
+    {
+      min_f = f;
+      min_i = i;
+    }
+  }
+
+  if (min_i == siz - 1)
+    return;
+  HBF::maze_s temp = statevec[siz -1];
+  statevec[siz -1] = statevec[min_i];
+  statevec[min_i] = temp;
+}
 
 
 int HBF::theta_to_stack_number(double theta){
@@ -40,6 +62,12 @@ int HBF::idx(double float_num) {
   return int(floor(float_num));
 }
 
+double HBF::h(double x, double y)
+{
+  return sqrt((this->goalx - x) * (this->goalx - x) + (this->goaly - y) * (this->goaly - y));
+
+}
+
 
 vector<HBF::maze_s> HBF::expand(HBF::maze_s state) {
   int g = state.g;
@@ -61,6 +89,7 @@ vector<HBF::maze_s> HBF::expand(HBF::maze_s state) {
     }
     double x2 = x + SPEED * cos(theta);
     double y2 = y + SPEED * sin(theta);
+    double f2 = g2 + h(x2, y2);
     HBF::maze_s state2;
     state2.g = g2;
     state2.x = x2;
@@ -123,12 +152,19 @@ HBF::maze_path HBF::search(vector< vector<int> > grid, vector<double> start, vec
   bool finished = false;
   while(!opened.empty())
   {
+    // we need to get the state that has the smallest f value, and then exchange it to the last one
+    // by this way, we will only need tot do a pop
+    rearrange_state_vec(opened);
+    maze_s current = opened[opened.size() -1];
+    opened.pop_back();
 
-    maze_s current = opened[0]; //grab first elment
-    opened.erase(opened.begin()); //pop first element
+    // maze_s current = opened[0]; //grab first elment
+    // opened.erase(opened.begin()); //pop first element
 
     int x = current.x;
     int y = current.y;
+    
+    GRID_expansion[idx(x)][idx(y)] += 1;
 
     if(idx(x) == goal[0] && idx(y) == goal[1])
     {
@@ -148,6 +184,7 @@ HBF::maze_path HBF::search(vector< vector<int> > grid, vector<double> start, vec
       double x2 = next_state[i].x;
       double y2 = next_state[i].y;
       double theta2 = next_state[i].theta;
+      double f2 = g2 + h(x2, y2);
 
       if((x2 < 0 || x2 >= grid.size()) || (y2 < 0 || y2 >= grid[0].size()))
       {

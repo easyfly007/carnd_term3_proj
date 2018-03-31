@@ -38,7 +38,7 @@ vector< vector<int> > GRID_expansion;
 
 vector<double> START = {0.0,0.0,0.0};
 vector<int> GOAL = {(int)GRID.size()-1, (int)GRID[0].size()-1};
-vector
+
 
 int main() {
 
@@ -58,12 +58,26 @@ int main() {
 
   for (int colIdx = 0; colIdx < GRID.size(); colIdx ++)
   {
-    vector<int> rowExpansion{0, GRID[0].size()};
+    vector<int> rowExpansion;
+    for (int j = 0; j < GRID[0].size(); j ++)
+      rowExpansion.push_back(1);
     GRID_expansion.push_back(rowExpansion);
   }
+
+  cout << "the expansion grid " << endl;
+  for(int i = 0; i < GRID_expansion.size(); i++)
+  {
+    cout << GRID_expansion[i][0];
+    for(int j = 1; j < GRID_expansion[0].size(); j++)
+    {
+      cout << "," << GRID_expansion[i][j];
+    }
+    cout << endl;
+  }
+
   
 
-  HBF hbf = HBF();
+  HBF hbf = HBF(GOAL[0], GOAL[1]);
 
   HBF::maze_path get_path = hbf.search(GRID,START,GOAL);
 
@@ -80,6 +94,19 @@ int main() {
       cout << "theta " << step.theta << endl;
 
   }
+
+  for(int i = 0; i < GRID_expansion.size(); i++)
+  {
+    cout << GRID_expansion[i][0];
+    for(int j = 1; j < GRID_expansion[0].size(); j++)
+    {
+      cout << "," << GRID_expansion[i][j];
+    }
+    cout << endl;
+  }
+
+
+
   
   return 0;
 }
