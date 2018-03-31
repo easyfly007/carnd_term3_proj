@@ -34,9 +34,11 @@ vector< vector<int> > MAZE = {
 
 
 vector< vector<int> > GRID = MAZE;
+vector< vector<int> > GRID_expansion;
 
 vector<double> START = {0.0,0.0,0.0};
 vector<int> GOAL = {(int)GRID.size()-1, (int)GRID[0].size()-1};
+vector
 
 int main() {
 
@@ -53,6 +55,13 @@ int main() {
     }
     cout << endl;
   }
+
+  for (int colIdx = 0; colIdx < GRID.size(); colIdx ++)
+  {
+    vector<int> rowExpansion{0, GRID[0].size()};
+    GRID_expansion.push_back(rowExpansion);
+  }
+  
 
   HBF hbf = HBF();
 
