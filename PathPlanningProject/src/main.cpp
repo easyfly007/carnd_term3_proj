@@ -245,17 +245,35 @@ int main() {
 			vector<double> next_x_vals;
 			vector<double> next_y_vals;
 
+			cout << "\n\nfor trajectory prediction " << endl;
 			double dist_inc = 0.5;
+			double pos_x = car_x;
+			double pos_y = car_y;
+			int path_size = previous_path_x.size();
+			double angle = deg2rad(car_yaw);
+			if (path_size > 1)
+			{
+				pos_x = previous_path_x[path_size -1];
+				pos_y = previous_path_y[path_size -1];
+				double pos_x2 = previous_path_x[path_size -2];
+				double pos_y2 = previous_path_y[path_size -2];
+				angle = atan2(pos_y - pos_y2, pos_x - pos_x2);
+			}
+			vector<double> pos_sd = getFrenet(pos_x, pos_y, angle, map_waypoints_x, map_waypoints_y);
+			double pos_s = pos_sd[0];
+			double pos_d = pos_sd[1];
 			for (int i = 0; i < 50; i ++)
 			{
-				double next_s = car_x + (i + 1) * dist_inc;
+				double next_s = pos_s + (i + 1) * dist_inc;
 				double next_d = 6.;
 				vector<double> next_xy = getXY(next_s, next_d, map_waypoints_s,map_waypoints_x,map_waypoints_y);
 				double next_x = next_xy[0];
 				double next_y = next_xy[1];
 				next_x_vals.push_back(next_x);
 				next_y_vals.push_back(next_y);
+				cout << "x = " << next_x << ", y = " << next_y << ", s = " << next_s << ", d = " << next_d << endl;
 			}
+
 			/*
 			// TODO: define a path made up of (x,y) points that the car will visit sequentially every .02 seconds
 			double pos_x, pos_y;
