@@ -270,6 +270,13 @@ int main() {
 			}
 
 			double dist_inc = 0.5;
+			for (int i = 0; i < 50 - path_size; i ++)
+			{
+				next_x_vals.push_back(pos_x + dist_inc * cos(angle + (i + 1) * pi() / 100));
+				next_y_vals.push_back(pos_y + dist_inc * sin(angle + (i + 1) * pi() / 100));
+				pos_x = dist_inc * cos(angle + (i + 1) * pi() / 100);
+				pos_y = dist_inc * sin(angle + (i + 1) * pi() / 100);
+			}
 
 
 			// double dist_inc = 0.5;
