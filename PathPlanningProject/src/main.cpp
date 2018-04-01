@@ -249,6 +249,8 @@ int main() {
 			double pos_x, pos_y;
 			double angle;
 			int path_size = previous_path_x.size();
+			assert(previous_path_x.size() == previous_path_y.size());
+
 			for (int i = 0; i < path_size; i ++)
 			{
 				next_x_vals.push_back(previous_path_x[i]);
@@ -258,7 +260,8 @@ int main() {
 			if (path_size == 0)
 			{
 				pos_x = car_x;
-				pos_y = car_y;angle = deg2rad(car_yaw);
+				pos_y = car_y;
+				angle = deg2rad(car_yaw);
 			}
 			else
 			{
@@ -266,7 +269,7 @@ int main() {
 				pos_y = previous_path_y[path_size - 1];
 				double pos_x2 = previous_path_x[path_size - 2];
 				double pos_y2 = previous_path_y[path_size - 2];
-				angle = atan2(pos_y2 - pos_y, pos_x2 - pos_x);
+				angle = atan2(pos_y - pos_y2, pos_x - pos_x2);
 			}
 
 			double dist_inc = 0.5;
