@@ -249,7 +249,6 @@ int main() {
 			{
 				double next_s = car_x + (i + 1) * dist_inc;
 				double next_d = 6.;
-				map_waypoints_x
 				vector<double> next_xy = getXY(next_s, next_d, map_waypoints_s,map_waypoints_x,map_waypoints_y);
 				double next_x = next_xy[0];
 				double next_y = next_xy[1];
