@@ -87,7 +87,8 @@ int NextWaypoint(double x, double y, double theta, const vector<double> &maps_x,
 }
 
 // Transform from Cartesian x,y coordinates to Frenet s,d coordinates
-vector<double> getFrenet(double x, double y, double theta, const vector<double> &maps_x, const vector<double> &maps_y)
+vector<double> getFrenet(double x, double y, double theta, 
+	const vector<double> &maps_x, const vector<double> &maps_y)
 {
 	int next_wp = NextWaypoint(x,y, theta, maps_x,maps_y);
 
@@ -136,7 +137,8 @@ vector<double> getFrenet(double x, double y, double theta, const vector<double> 
 }
 
 // Transform from Frenet s,d coordinates to Cartesian x,y
-vector<double> getXY(double s, double d, const vector<double> &maps_s, const vector<double> &maps_x, const vector<double> &maps_y)
+vector<double> getXY(double s, double d, const vector<double> &maps_s, 
+	const vector<double> &maps_x, const vector<double> &maps_y)
 {
 	int prev_wp = -1;
 
@@ -244,12 +246,38 @@ int main() {
 
 
 			// TODO: define a path made up of (x,y) points that the car will visit sequentially every .02 seconds
-			double dist_inc = 0.5;
-			for (int i = 0; i < 50; i ++)
+			double pos_x, pos_y;
+			double angle;
+			int path_size = previous_path_x.size();
+			for (int i = 0; i < path_size; i ++)
 			{
-				next_x_vals.push_back(car_x + (dist_inc * i) * cos(deg2rad(car_yaw)) );
-				next_y_vals.push_back(car_y + (dist_inc * i) * sin(deg2rad(car_yaw)));
+				next_x_vals.push_back(previous_path_x[i]);
+				next_y_vals.push_back(previous_path_y[i]);
 			}
+
+			if (path_size == 0)
+			{
+				pos_x = car_x;
+				pos_y = car_y;angle = deg2rad(car_yaw);
+			}
+			else
+			{
+				pos_x = previous_path_x[path_size - 1];
+				pos_y = previous_path_y[path_size - 1];
+				double pos_x2 = previous_path_x[path_size - 2];
+				double pos_y2 = previous_path_y[path_size - 2];
+				angle = atan2(pos_y2 - pos_y, pos_x2 - pos_x);
+			}
+
+			double dist_inc = 0.5;
+
+
+			// double dist_inc = 0.5;
+			// for (int i = 0; i < 50; i ++)
+			// {
+			// 	next_x_vals.push_back(car_x + (dist_inc * i) * cos(deg2rad(car_yaw)) );
+			// 	next_y_vals.push_back(car_y + (dist_inc * i) * sin(deg2rad(car_yaw)));
+			// }
 			msgJson["next_x"] = next_x_vals;
 			msgJson["next_y"] = next_y_vals;
 
