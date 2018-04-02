@@ -38,6 +38,15 @@ we will manually calc the car orientation angle from the previous points and cal
 see the commented codes for strategy 3
 just keep the s increasing and d un-changed
 
+4. need to try to make the future points smooth that in case we meet a sharp turn, we can still meet the jerk requirement
+
+I use the way aaron suggested that use a far away points (still in the middle of the lane), and then interplate the future time points.
+spline.h file will be help to finish this.
+
+
+4. use sensor fusion and detect if there's a slow car in the front of ego
+then decide to slow down the car to avoid colision
+
 
 ## Basic Build Instructions
 

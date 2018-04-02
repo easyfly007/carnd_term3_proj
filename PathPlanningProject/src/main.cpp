@@ -14,6 +14,10 @@ using namespace std;
 
 // for convenience
 using json = nlohmann::json;
+extern vector<vector<double> > strategy1();
+extern vector<vector<double> > strategy2();
+extern vector<vector<double> > strategy3();
+extern vector<vector<double> > strategy4();
 
 // For converting back and forth between radians and degrees.
 constexpr double pi() { return M_PI; }
@@ -244,8 +248,13 @@ int main() {
 
 			vector<double> next_x_vals;
 			vector<double> next_y_vals;
-
 			double dist_inc = 0.5;
+
+			// strategy 4, check if there's car in the front of the ego car 
+			// slow down if there's a car in the front of us
+
+			/* 
+			// strategy 3, keep in the lane
 			double pos_x = car_x;
 			double pos_y = car_y;
 			int path_size = previous_path_x.size();
@@ -271,11 +280,12 @@ int main() {
 				next_x_vals.push_back(next_x);
 				next_y_vals.push_back(next_y);
 			}
+			*/
 
 
 			/*
 			// strategy 2, consider the previous points and calc the car angle manually
-			keep the car turing around in a circle 
+			// keep the car turing around in a circle 
 			double pos_x, pos_y;
 			double angle;
 			int path_size = previous_path_x.size();
@@ -302,7 +312,6 @@ int main() {
 				angle = atan2(pos_y - pos_y2, pos_x - pos_x2);
 			}
 
-			double dist_inc = 0.5;
 			for (int i = 0; i < 50 - path_size; i ++)
 			{
 				next_x_vals.push_back(pos_x + dist_inc * cos(angle + (i + 1) * pi() / 100));
@@ -313,7 +322,6 @@ int main() {
 			*/
 
 			/* strategy 1, go straight line
-			double dist_inc = 0.5;
 			for (int i = 0; i < 50; i ++)
 			{
 				next_x_vals.push_back(car_x + (dist_inc * i) * cos(deg2rad(car_yaw)) );
