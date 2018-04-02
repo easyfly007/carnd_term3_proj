@@ -245,7 +245,6 @@ int main() {
 			vector<double> next_x_vals;
 			vector<double> next_y_vals;
 
-			cout << "\n\nfor trajectory prediction " << endl;
 			double dist_inc = 0.5;
 			double pos_x = car_x;
 			double pos_y = car_y;
@@ -265,17 +264,18 @@ int main() {
 			for (int i = 0; i < 50; i ++)
 			{
 				double next_s = pos_s + (i + 1) * dist_inc;
-				double next_d = 6.;
+				double next_d = pos_d;
 				vector<double> next_xy = getXY(next_s, next_d, map_waypoints_s,map_waypoints_x,map_waypoints_y);
 				double next_x = next_xy[0];
 				double next_y = next_xy[1];
 				next_x_vals.push_back(next_x);
 				next_y_vals.push_back(next_y);
-				cout << "x = " << next_x << ", y = " << next_y << ", s = " << next_s << ", d = " << next_d << endl;
 			}
 
+
 			/*
-			// TODO: define a path made up of (x,y) points that the car will visit sequentially every .02 seconds
+			// strategy 2, consider the previous points and calc the car angle manually
+			keep the car turing around in a circle 
 			double pos_x, pos_y;
 			double angle;
 			int path_size = previous_path_x.size();
@@ -300,9 +300,8 @@ int main() {
 				double pos_x2 = previous_path_x[path_size - 2];
 				double pos_y2 = previous_path_y[path_size - 2];
 				angle = atan2(pos_y - pos_y2, pos_x - pos_x2);
-			}*/
+			}
 
-			/*
 			double dist_inc = 0.5;
 			for (int i = 0; i < 50 - path_size; i ++)
 			{
@@ -311,8 +310,9 @@ int main() {
 				pos_x += dist_inc * cos(angle + (i + 1) * pi() / 100);
 				pos_y += dist_inc * sin(angle + (i + 1) * pi() / 100);
 			}
+			*/
 
-
+			/* strategy 1, go straight line
 			double dist_inc = 0.5;
 			for (int i = 0; i < 50; i ++)
 			{
