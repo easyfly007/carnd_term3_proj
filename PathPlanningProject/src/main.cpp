@@ -248,6 +248,7 @@ int main() {
 			vector<double> next_x_vals;
 			vector<double> next_y_vals;
 
+
 			// strategy 4, to make the turing more smooth
 			vector<double> ptsx, ptsy;
 			double ref_x = car_x, ref_y = car_y;
@@ -312,37 +313,37 @@ int main() {
 
 			// calc how to break up spline points so that we travel at our designed ref veelovity
 			double target_x = 30.0;
-			double target_y = t(target_x);
+			double target_y = s(target_x);
 			double target_dist = sqrt(target_x * target_x + target_y * target_y);
 			double x_add_on = 0;
 			for (int i = 0; i < 50 - path_size; i ++)
 			{
 				double N = target_dist / (0.02 * ref_v / 2.24);
 				double x_point = x_add_on + target_x / N;
-				double y_point = t(x_point);
+				double y_point = s(x_point);
 				x_add_on = x_point;
 
 				double x_ref = x_point;
 				double y_ref = y_point;
-				x_mapcoord = x_ref * cos(ref_yaw) - y_ref * sin(ref_yaw);
-				y_mapcoord = x_ref * sin(ref_yaw) + y_ref * cos(ref_yaw);
+				double x_mapcoord = x_ref * cos(ref_yaw) - y_ref * sin(ref_yaw);
+				double y_mapcoord = x_ref * sin(ref_yaw) + y_ref * cos(ref_yaw);
 				x_mapcoord += ref_x; // now x_point and y_point as the map coordinate
 				y_mapcoord += ref_y;
 				next_x_vals.push_back(x_mapcoord);
 				next_y_vals.push_back(y_mapcoord);
-
-
 			}
 
-
-			
-
-			path_plan_strategy1(next_x_vals, next_y_vals, car_yaw, car_x, car_y);
-			path_plan_strategy2(next_x_vals, next_y_vals, car_yaw, car_x, car_y, 
-				previous_path_x, previous_path_y);
-			path_plan_strategy3(next_x_vals, next_y_vals, car_yaw, car_x, car_y, 
+			// path_plan_strategy1(next_x_vals, next_y_vals, car_yaw, car_x, car_y);
+			// path_plan_strategy2(next_x_vals, next_y_vals, car_yaw, car_x, car_y, 
+			// 	previous_path_x, previous_path_y);
+			// path_plan_strategy3(next_x_vals, next_y_vals, car_yaw, car_x, car_y, 
+			// 	previous_path_x, previous_path_y,
+			// 	map_waypoints_x, map_waypoints_y,map_waypoints_s, map_waypoints_dx, map_waypoints_dy);
+			path_plan_strategy4(
+				next_x_vals, next_y_vals, 
+				car_yaw, car_d, car_x, car_y, 
 				previous_path_x, previous_path_y,
-				map_waypoints_x, map_waypoints_y,map_waypoints_s, map_waypoints_dx, map_waypoints_dy);
+				map_waypoints_x, map_waypoints_y, map_waypoints_s,map_waypoints_dx, map_waypoints_dy);
 
 
 			msgJson["next_x"] = next_x_vals;
