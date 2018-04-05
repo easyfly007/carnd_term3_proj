@@ -281,48 +281,12 @@ int main() {
 			}
 			*/
 
-
-			/*
-			// strategy 2, consider the previous points and calc the car angle manually
-			// keep the car turing around in a circle 
-			double pos_x, pos_y;
-			double angle;
-			int path_size = previous_path_x.size();
-			assert(previous_path_x.size() == previous_path_y.size());
-
-			for (int i = 0; i < path_size; i ++)
-			{
-				next_x_vals.push_back(previous_path_x[i]);
-				next_y_vals.push_back(previous_path_y[i]);
-			}
-
-			if (path_size == 0)
-			{
-				pos_x = car_x;
-				pos_y = car_y;
-				angle = deg2rad(car_yaw);
-			}
-			else
-			{
-				pos_x = previous_path_x[path_size - 1];
-				pos_y = previous_path_y[path_size - 1];
-				double pos_x2 = previous_path_x[path_size - 2];
-				double pos_y2 = previous_path_y[path_size - 2];
-				angle = atan2(pos_y - pos_y2, pos_x - pos_x2);
-			}
-
-			for (int i = 0; i < 50 - path_size; i ++)
-			{
-				next_x_vals.push_back(pos_x + dist_inc * cos(angle + (i + 1) * pi() / 100));
-				next_y_vals.push_back(pos_y + dist_inc * sin(angle + (i + 1) * pi() / 100));
-				pos_x += dist_inc * cos(angle + (i + 1) * pi() / 100);
-				pos_y += dist_inc * sin(angle + (i + 1) * pi() / 100);
-			}
-			*/
 			path_plan_strategy1(next_x_vals, next_y_vals, car_yaw, car_x, car_y);
 			path_plan_strategy2(next_x_vals, next_y_vals, car_yaw, car_x, car_y, 
 				previous_path_x, previous_path_y);
-
+			path_plan_strategy3(next_x_vals, next_y_vals, car_yaw, car_x, car_y, 
+				previous_path_x, previous_path_y,
+				map_waypoints_x, map_waypoints_y,map_waypoints_s, map_waypoints_dx, map_waypoints_dy);
 
 
 			msgJson["next_x"] = next_x_vals;

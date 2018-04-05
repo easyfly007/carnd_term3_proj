@@ -3,8 +3,16 @@
 #include <assert.h>
 
 using namespace std;
+
 extern double deg2rad(double x);
+
 constexpr double pi() { return M_PI; }
+
+extern vector<double> getFrenet(double x, double y, double theta, 
+	const vector<double> &maps_x, const vector<double> &maps_y);
+
+extern vector<double> getXY(double s, double d, const vector<double> &maps_s, 
+	const vector<double> &maps_x, const vector<double> &maps_y);
 
 void path_plan_strategy1(vector<double> &next_x_vals, vector<double> &next_y_vals, 
 	double car_yaw, double car_x, double car_y)
@@ -63,4 +71,44 @@ void path_plan_strategy2(vector<double> &next_x_vals, vector<double> &next_y_val
 		pos_y += dist_inc * sin(angle + (i + 1) * pi() / 100);
 	}
 }
+
+
+void path_plan_strategy3(
+	vector<double> &next_x_vals, vector<double> &next_y_vals, 
+	double car_yaw, double car_x, double car_y, 
+	vector<double> &previous_path_x, vector<double> &previous_path_y,
+	vector<double> &map_waypoints_x,
+	vector<double> &map_waypoints_y,
+	vector<double> &map_waypoints_s,
+	vector<double> &map_waypoints_dx,
+	vector<double> &map_waypoints_dy)
+{
+	double dist_inc = 0.5;
+	double pos_x = car_x;
+	double pos_y = car_y;
+	int path_size = previous_path_x.size();
+	double angle = deg2rad(car_yaw);
+	if (path_size > 1)
+	{
+		pos_x = previous_path_x[path_size -1];
+		pos_y = previous_path_y[path_size -1];
+		double pos_x2 = previous_path_x[path_size -2];
+		double pos_y2 = previous_path_y[path_size -2];
+		angle = atan2(pos_y - pos_y2, pos_x - pos_x2);
+	}
+	vector<double> pos_sd = getFrenet(pos_x, pos_y, angle, map_waypoints_x, map_waypoints_y);
+	double pos_s = pos_sd[0];
+	double pos_d = pos_sd[1];
+	for (int i = 0; i < 50; i ++)
+	{
+		double next_s = pos_s + (i + 1) * dist_inc;
+		double next_d = pos_d;
+		vector<double> next_xy = getXY(next_s, next_d, map_waypoints_s,map_waypoints_x,map_waypoints_y);
+		double next_x = next_xy[0];
+		double next_y = next_xy[1];
+		next_x_vals.push_back(next_x);
+		next_y_vals.push_back(next_y);
+	}
+}
+
 
