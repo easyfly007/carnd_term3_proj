@@ -252,6 +252,7 @@ int main() {
 			vector<double> next_x_vals;
 			vector<double> next_y_vals;
 
+
 			// path_plan_strategy1(next_x_vals, next_y_vals, car_yaw, car_x, car_y, car_speed);
 			// path_plan_strategy2(next_x_vals, next_y_vals, car_yaw, car_x, car_y, 
 			// 	previous_path_x, previous_path_y);
@@ -263,6 +264,7 @@ int main() {
 				previous_path_x, previous_path_y, end_path_s, end_path_d, map_waypoints_x,
 				map_waypoints_y, map_waypoints_s, map_waypoints_dx, map_waypoints_dy, sensor_fusion);
 
+			// ref_v = 49.5;
 			path_plan_strategy4(
 				next_x_vals, next_y_vals, 
 				car_yaw, car_s, car_d, car_x, car_y, ref_v,

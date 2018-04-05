@@ -19,6 +19,7 @@ extern vector<double> getXY(double s, double d, const vector<double> &maps_s,
 
 int getLane(double d)
 {
+	return 1;
 	if (0.0 <= d && d <= 4.0)
 		return 0;
 	if (4.0 <= d && d <= 8.0)
@@ -33,14 +34,12 @@ void path_plan_strategy1(vector<double> &next_x_vals, vector<double> &next_y_val
 	// output: next_x_vals, next_y_vals
 
 	// make the car move in a straight line
-	double dist_inc = 0.25;
-	for (int i = 1; i < 50; i ++)
+	double dist_inc = 0.225;
+	for (int i = 1; i < 100; i ++)
 	{
 		next_x_vals.push_back(car_x + (dist_inc * i) * cos(deg2rad(car_yaw)) );
 		next_y_vals.push_back(car_y + (dist_inc * i) * sin(deg2rad(car_yaw)));
 	}
-	cout << "car v = " << car_v <<", car x = " << car_x <<", car y = " << car_y << endl;
-
 	return;
 }
 
@@ -77,7 +76,7 @@ void path_plan_strategy2(vector<double> &next_x_vals, vector<double> &next_y_val
 		angle = atan2(pos_y - pos_y2, pos_x - pos_x2);
 	}
 
-	for (int i = 0; i < 50 - path_size; i ++)
+	for (int i = 0; i < 100 - path_size; i ++)
 	{
 		next_x_vals.push_back(pos_x + dist_inc * cos(angle + (i + 1) * pi() / 100));
 		next_y_vals.push_back(pos_y + dist_inc * sin(angle + (i + 1) * pi() / 100));
@@ -113,7 +112,7 @@ void path_plan_strategy3(
 	vector<double> pos_sd = getFrenet(pos_x, pos_y, angle, map_waypoints_x, map_waypoints_y);
 	double pos_s = pos_sd[0];
 	double pos_d = pos_sd[1];
-	for (int i = 0; i < 50; i ++)
+	for (int i = 0; i < 100; i ++)
 	{
 		double next_s = pos_s + (i + 1) * dist_inc;
 		double next_d = pos_d;
@@ -144,7 +143,6 @@ void path_plan_strategy4(
 	int lane = getLane(car_s);
 	// velocity limit is 50, we will set the ref vel close to limit, but not exceed it 
 	int path_size = previous_path_x.size();
-	cout << "\n there are " << path_size << " previous path points" << endl;
 	if (path_size < 2)
 	{
 		double prev_car_x = car_x - cos(car_yaw);
@@ -206,7 +204,7 @@ void path_plan_strategy4(
 	double target_y = s(target_x);
 	double target_dist = sqrt(target_x * target_x + target_y * target_y);
 	double x_add_on = 0;
-	for (int i = 1; i < 50 - path_size; i ++)
+	for (int i = 1; i < 100 - path_size; i ++)
 	{
 		double N = target_dist / (0.02 * ref_v / 2.24);
 		double x_point = i * (target_x / N);
@@ -221,20 +219,6 @@ void path_plan_strategy4(
 		next_x_vals.push_back(x_mapcoord);
 		next_y_vals.push_back(y_mapcoord);
 	}
-	cout << "car x, car y = " << car_x <<", " << car_y << endl;
-	cout << "car s = " << car_s << endl;
-	cout << "prev path size = " << previous_path_x.size()<< endl;
-	cout << "the next s vals = "<< endl;
-	for (int i = 0; i < next_x_vals.size(); i ++)
-		cout << next_x_vals[i] << ", ";
-	cout << endl;
-	cout << "the next y vals = " << endl;
-	for (int i = 0; i < next_y_vals.size(); i ++)
-		cout << next_y_vals[i] << ", ";
-	cout << endl;
-	
-
-
 }
 
 
@@ -282,13 +266,13 @@ double path_plan_strategy5(
 	}
 	if (tooclose)
 	{
-		ref_v -= 0.225;
-		cout << "slow down 0.225 to avoid collision" << endl;
+		ref_v -= 0.25;
+		cout << " slow down 0.225 to avoid collision" << endl;
 	}
 	else if (ref_v < 49.5)
 	{
 		cout << " speed up 0.225 to meet 49.5 " << endl;
-		ref_v += 0.225;
+		ref_v += 0.25;
 	}
 
 	return ref_v;
