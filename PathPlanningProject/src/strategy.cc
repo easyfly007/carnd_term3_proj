@@ -27,18 +27,20 @@ int getLane(double d)
 }
 
 void path_plan_strategy1(vector<double> &next_x_vals, vector<double> &next_y_vals, 
-	double car_yaw, double car_x, double car_y)
+	double car_yaw, double car_x, double car_y, double car_v)
 {
 	// input: car_yaw
 	// output: next_x_vals, next_y_vals
 
 	// make the car move in a straight line
-	double dist_inc = 0.5;
-	for (int i = 0; i < 50; i ++)
+	double dist_inc = 0.25;
+	for (int i = 1; i < 50; i ++)
 	{
 		next_x_vals.push_back(car_x + (dist_inc * i) * cos(deg2rad(car_yaw)) );
 		next_y_vals.push_back(car_y + (dist_inc * i) * sin(deg2rad(car_yaw)));
 	}
+	cout << "car v = " << car_v <<", car x = " << car_x <<", car y = " << car_y << endl;
+
 	return;
 }
 
@@ -219,6 +221,19 @@ void path_plan_strategy4(
 		next_x_vals.push_back(x_mapcoord);
 		next_y_vals.push_back(y_mapcoord);
 	}
+	cout << "car x, car y = " << car_x <<", " << car_y << endl;
+	cout << "car s = " << car_s << endl;
+	cout << "prev path size = " << previous_path_x.size()<< endl;
+	cout << "the next s vals = "<< endl;
+	for (int i = 0; i < next_x_vals.size(); i ++)
+		cout << next_x_vals[i] << ", ";
+	cout << endl;
+	cout << "the next y vals = " << endl;
+	for (int i = 0; i < next_y_vals.size(); i ++)
+		cout << next_y_vals[i] << ", ";
+	cout << endl;
+	
+
 
 }
 
@@ -226,7 +241,7 @@ void path_plan_strategy4(
 // add sensor fusion, check the other cars, lower down the ref speed 
 double path_plan_strategy5(
 	vector<double> &next_x_vals, vector<double> &next_y_vals, 
-	double car_yaw, double car_s, double car_d, double car_x, double car_y, 
+	double car_yaw, double car_s, double car_d, double car_x, double car_y, double ref_v,
 	vector<double> &previous_path_x, vector<double> &previous_path_y,
 	double end_path_s, double end_path_d,
 	vector<double> &map_waypoints_x,
@@ -236,7 +251,6 @@ double path_plan_strategy5(
 	vector<double> &map_waypoints_dy,
 	vector<vector<double> > &sensor_fusion)
 {
-	double ref_v = 49.0;
 	int lane = getLane(car_d);
 	// sensorfusion
 	// [id, x, y, vx, vy, s, d]
@@ -263,11 +277,19 @@ double path_plan_strategy5(
 			check_car_s += prev_size * 0.02 * check_speed;
 			// we will check in a futuer s range that if ego car and checked are will collision
 			if (check_car_s > car_s && check_car_s - car_s < 30)
-			{
-				cout << "lower down speed to 29.5 " << endl;
-				ref_v = 29.5;
-			}
+				tooclose = true;
 		}
 	}
+	if (tooclose)
+	{
+		ref_v -= 0.225;
+		cout << "slow down 0.225 to avoid collision" << endl;
+	}
+	else if (ref_v < 49.5)
+	{
+		cout << " speed up 0.225 to meet 49.5 " << endl;
+		ref_v += 0.225;
+	}
+
 	return ref_v;
 }

@@ -169,8 +169,11 @@ vector<double> getXY(double s, double d, const vector<double> &maps_s,
 
 }
 
+double ref_v = 0.;
+
 int main() {
 	uWS::Hub h;
+
 
 	// Load up map values for waypoint's x,y,s and d normalized normal vectors
 	vector<double> map_waypoints_x;
@@ -213,6 +216,7 @@ int main() {
 			// The 2 signifies a websocket event
 			//auto sdata = string(data).substr(0, length);
 			//cout << sdata << endl;
+		cout << endl << endl;
 			if (length && length > 2 && data[0] == '4' && data[1] == '2') {
 
 			auto s = hasData(data);
@@ -248,14 +252,14 @@ int main() {
 			vector<double> next_x_vals;
 			vector<double> next_y_vals;
 
-			// path_plan_strategy1(next_x_vals, next_y_vals, car_yaw, car_x, car_y);
+			// path_plan_strategy1(next_x_vals, next_y_vals, car_yaw, car_x, car_y, car_speed);
 			// path_plan_strategy2(next_x_vals, next_y_vals, car_yaw, car_x, car_y, 
 			// 	previous_path_x, previous_path_y);
 			// path_plan_strategy3(next_x_vals, next_y_vals, car_yaw, car_x, car_y, 
 			// 	previous_path_x, previous_path_y,
 			// 	map_waypoints_x, map_waypoints_y,map_waypoints_s, map_waypoints_dx, map_waypoints_dy);
-			double ref_v =  path_plan_strategy5(
-				next_x_vals, next_y_vals, car_yaw,   car_s,   car_d,   car_x, car_y, 
+			ref_v =  path_plan_strategy5(
+				next_x_vals, next_y_vals, car_yaw, car_s, car_d, car_x, car_y, ref_v, 
 				previous_path_x, previous_path_y, end_path_s, end_path_d, map_waypoints_x,
 				map_waypoints_y, map_waypoints_s, map_waypoints_dx, map_waypoints_dy, sensor_fusion);
 
