@@ -243,21 +243,26 @@ double path_plan_strategy5(
 		car_s = end_path_s;
 	
 	bool tooclose = false;
-
+	cout <<"sensor fusion: " << endl;
 	for (int i = 0; i < sensor_fusion.size(); i ++)
 	{
-		float d = sensor_fusion[i][6];
+		double obs_car_id = sensor_fusion[i][0];
+		double obs_car_x  = sensor_fusion[i][1];
+		double obs_car_y  = sensor_fusion[i][2];
+		double obs_car_vx = sensor_fusion[i][3];
+		double obs_car_vy = sensor_fusion[i][4];
+		double obs_car_s  = sensor_fusion[i][5];
+		double obs_car_d  = sensor_fusion[i][6];
+		// for (int j = 0; j < sensor_fusion[i].size(); j ++)
+		// {
+		// 	cout << " " << j << "=" << sensor_fusion[i][j];
+		// }
+		// cout << endl;
 		// check if in the same lane
-		if (d < lane * 4 && d < lane * 4 + 4)
+		if (obs_car_d < lane * 4 && obs_car_d < lane * 4 + 4)
 		{
-			double vx = sensor_fusion[i][3];
-			double vy = sensor_fusion[i][4];
-			double check_speed = sqrt(vx*vx + vy*vy);
-			double s  = sensor_fusion[i][5];
-			double id = sensor_fusion[i][0];
-			double x  = sensor_fusion[i][1];
-			double y  = sensor_fusion[i][2];
-			double check_car_s = s;
+			double check_speed = sqrt(obs_car_vx*obs_car_vx + obs_car_vy*obs_car_vy);
+			double check_car_s = obs_car_s;
 			check_car_s += prev_size * 0.02 * check_speed;
 			// we will check in a futuer s range that if ego car and checked are will collision
 			if (check_car_s > car_s && check_car_s - car_s < 30)
@@ -267,12 +272,12 @@ double path_plan_strategy5(
 	if (tooclose)
 	{
 		ref_v -= 0.25;
-		cout << " slow down 0.225 to avoid collision" << endl;
+		cout << " slow down speed to avoid collision" << endl;
 	}
-	else if (ref_v < 49.5)
+	else if (ref_v < 49.5 - 0.45)
 	{
-		cout << " speed up 0.225 to meet 49.5 " << endl;
-		ref_v += 0.25;
+		cout << " speed up speed to meet 49.5 " << endl;
+		ref_v += 0.45;
 	}
 
 	return ref_v;
