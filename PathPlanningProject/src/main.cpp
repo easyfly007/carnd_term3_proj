@@ -234,8 +234,8 @@ int main() {
 			double car_speed = j[1]["speed"];
 
 			// Previous path data given to the Planner
-			auto previous_path_x = j[1]["previous_path_x"];
-			auto previous_path_y = j[1]["previous_path_y"];
+			vector<double> previous_path_x = j[1]["previous_path_x"];
+			vector<double> previous_path_y = j[1]["previous_path_y"];
 			// Previous path's end s and d values 
 			double end_path_s = j[1]["end_path_s"];
 			double end_path_d = j[1]["end_path_d"];
@@ -320,7 +320,8 @@ int main() {
 			}
 			*/
 			path_plan_strategy1(next_x_vals, next_y_vals, car_yaw, car_x, car_y);
-
+			path_plan_strategy2(next_x_vals, next_y_vals, car_yaw, car_x, car_y, 
+				previous_path_x, previous_path_y);
 
 
 
