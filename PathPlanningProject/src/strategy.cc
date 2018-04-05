@@ -1,5 +1,7 @@
 #include <vector>
 #include <math.h>
+#include <iostream>
+
 #include <assert.h>
 #include "spline.h"
 
@@ -116,7 +118,7 @@ void path_plan_strategy3(
 // smooth the line
 void path_plan_strategy4(
 	vector<double> &next_x_vals, vector<double> &next_y_vals, 
-	double car_yaw, double car_d, double car_x, double car_y, 
+	double car_yaw, double car_s, double car_d, double car_x, double car_y, 
 	vector<double> &previous_path_x, vector<double> &previous_path_y,
 	vector<double> &map_waypoints_x,
 	vector<double> &map_waypoints_y,
@@ -129,8 +131,10 @@ void path_plan_strategy4(
 	double ref_x = car_x, ref_y = car_y;
 	double ref_yaw = deg2rad(car_yaw);
 	double ref_v = 49.0; 
+	int lane = 1;
 	// velocity limit is 50, we will set the ref vel close to limit, but not exceed it 
 	int path_size = previous_path_x.size();
+	cout << "\n there are " << path_size << " previous path points" << endl;
 	if (path_size < 2)
 	{
 		double prev_car_x = car_x - cos(car_yaw);
@@ -152,11 +156,12 @@ void path_plan_strategy4(
 		ptsx.push_back(ref_x);
 		ptsy.push_back(ref_y);
 	}
-	vector<double> next_wp0 = getXY(car_x + 30, car_d, 
+
+	vector<double> next_wp0 = getXY(car_s + 30, 4*lane + 2, 
 		map_waypoints_s, map_waypoints_x,map_waypoints_y);
-	vector<double> next_wp1 = getXY(car_x + 60, car_d, 
+	vector<double> next_wp1 = getXY(car_s + 60, 4*lane +2, 
 		map_waypoints_s, map_waypoints_x,map_waypoints_y);
-	vector<double> next_wp2 = getXY(car_x + 90, car_d, 
+	vector<double> next_wp2 = getXY(car_s + 90, 4*lane + 2, 
 		map_waypoints_s, map_waypoints_x,map_waypoints_y);
 	
 	// data points for smoothing
@@ -175,7 +180,7 @@ void path_plan_strategy4(
 		double shift_x = ptsx[i] - ref_x;
 		double shift_y = ptsy[i] - ref_y;
 		ptsx[i] = shift_x * cos(0 - ref_yaw) - shift_y * sin(0 - ref_yaw);
-		ptsy[i] = shift_x * sin(0 - ref_yaw) + shift_y * cos(9 - ref_yaw);
+		ptsy[i] = shift_x * sin(0 - ref_yaw) + shift_y * cos(0 - ref_yaw);
 	}
 
 	tk::spline s;

@@ -19,7 +19,7 @@ extern void path_plan_strategy3(vector<double> &next_x_vals, vector<double> &nex
 
 extern void path_plan_strategy4(
 	vector<double> &next_x_vals, vector<double> &next_y_vals, 
-	double car_yaw, double car_d, double car_x, double car_y, 
+	double car_yaw, double car_s, double car_d, double car_x, double car_y, 
 	vector<double> &previous_path_x, vector<double> &previous_path_y,
 	vector<double> &map_waypoints_x,
 	vector<double> &map_waypoints_y,
