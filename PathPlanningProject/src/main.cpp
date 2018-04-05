@@ -10,14 +10,13 @@
 #include "json.hpp"
 #include "spline.h"
 
+#include "strategy.h"
+
 using namespace std;
 
 // for convenience
 using json = nlohmann::json;
-extern vector<vector<double> > strategy1();
-extern vector<vector<double> > strategy2();
-extern vector<vector<double> > strategy3();
-extern vector<vector<double> > strategy4();
+
 
 // For converting back and forth between radians and degrees.
 constexpr double pi() { return M_PI; }
@@ -320,14 +319,10 @@ int main() {
 				pos_y += dist_inc * sin(angle + (i + 1) * pi() / 100);
 			}
 			*/
+			path_plan_strategy1(next_x_vals, next_y_vals, car_yaw, car_x, car_y);
 
-			/* strategy 1, go straight line
-			for (int i = 0; i < 50; i ++)
-			{
-				next_x_vals.push_back(car_x + (dist_inc * i) * cos(deg2rad(car_yaw)) );
-				next_y_vals.push_back(car_y + (dist_inc * i) * sin(deg2rad(car_yaw)));
-			}
-			*/
+
+
 
 			msgJson["next_x"] = next_x_vals;
 			msgJson["next_y"] = next_y_vals;
