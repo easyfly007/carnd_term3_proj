@@ -17,6 +17,15 @@ extern vector<double> getFrenet(double x, double y, double theta,
 extern vector<double> getXY(double s, double d, const vector<double> &maps_s, 
 	const vector<double> &maps_x, const vector<double> &maps_y);
 
+int getLane(double d)
+{
+	if (0.0 <= d && d <= 4.0)
+		return 0;
+	if (4.0 <= d && d <= 8.0)
+		return 1;
+	return 2;
+}
+
 void path_plan_strategy1(vector<double> &next_x_vals, vector<double> &next_y_vals, 
 	double car_yaw, double car_x, double car_y)
 {
@@ -118,7 +127,7 @@ void path_plan_strategy3(
 // smooth the line
 void path_plan_strategy4(
 	vector<double> &next_x_vals, vector<double> &next_y_vals, 
-	double car_yaw, double car_s, double car_d, double car_x, double car_y, 
+	double car_yaw, double car_s, double car_d, double car_x, double car_y, double ref_v,
 	vector<double> &previous_path_x, vector<double> &previous_path_y,
 	vector<double> &map_waypoints_x,
 	vector<double> &map_waypoints_y,
@@ -130,8 +139,7 @@ void path_plan_strategy4(
 	vector<double> ptsx, ptsy;
 	double ref_x = car_x, ref_y = car_y;
 	double ref_yaw = deg2rad(car_yaw);
-	double ref_v = 49.0; 
-	int lane = 1;
+	int lane = getLane(car_s);
 	// velocity limit is 50, we will set the ref vel close to limit, but not exceed it 
 	int path_size = previous_path_x.size();
 	cout << "\n there are " << path_size << " previous path points" << endl;
@@ -212,4 +220,54 @@ void path_plan_strategy4(
 		next_y_vals.push_back(y_mapcoord);
 	}
 
+}
+
+
+// add sensor fusion, check the other cars, lower down the ref speed 
+double path_plan_strategy5(
+	vector<double> &next_x_vals, vector<double> &next_y_vals, 
+	double car_yaw, double car_s, double car_d, double car_x, double car_y, 
+	vector<double> &previous_path_x, vector<double> &previous_path_y,
+	double end_path_s, double end_path_d,
+	vector<double> &map_waypoints_x,
+	vector<double> &map_waypoints_y,
+	vector<double> &map_waypoints_s,
+	vector<double> &map_waypoints_dx,
+	vector<double> &map_waypoints_dy,
+	vector<vector<double> > &sensor_fusion)
+{
+	double ref_v = 49.0;
+	int lane = getLane(car_d);
+	// sensorfusion
+	// [id, x, y, vx, vy, s, d]
+	int prev_size = previous_path_x.size();
+	if (prev_size > 0)
+		car_s = end_path_s;
+	
+	bool tooclose = false;
+
+	for (int i = 0; i < sensor_fusion.size(); i ++)
+	{
+		float d = sensor_fusion[i][6];
+		// check if in the same lane
+		if (d < lane * 4 && d < lane * 4 + 4)
+		{
+			double vx = sensor_fusion[i][3];
+			double vy = sensor_fusion[i][4];
+			double check_speed = sqrt(vx*vx + vy*vy);
+			double s  = sensor_fusion[i][5];
+			double id = sensor_fusion[i][0];
+			double x  = sensor_fusion[i][1];
+			double y  = sensor_fusion[i][2];
+			double check_car_s = s;
+			check_car_s += prev_size * 0.02 * check_speed;
+			// we will check in a futuer s range that if ego car and checked are will collision
+			if (check_car_s > car_s && check_car_s - car_s < 30)
+			{
+				cout << "lower down speed to 29.5 " << endl;
+				ref_v = 29.5;
+			}
+		}
+	}
+	return ref_v;
 }
