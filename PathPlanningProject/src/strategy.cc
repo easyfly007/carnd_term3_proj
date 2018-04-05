@@ -199,9 +199,8 @@ void path_plan_strategy4(
 	for (int i = 1; i < 50 - path_size; i ++)
 	{
 		double N = target_dist / (0.02 * ref_v / 2.24);
-		double x_point = x_add_on + target_x / N;
+		double x_point = i * (target_x / N);
 		double y_point = s(x_point);
-		x_add_on = x_point;
 
 		double x_ref = x_point;
 		double y_ref = y_point;
