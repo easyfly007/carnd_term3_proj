@@ -200,8 +200,14 @@ void path_plan_strategy4(
 	}
 
 	// calc how to break up spline points so that we travel at our designed ref veelovity
-	double target_x = 30.0;
+	double target_x = 50.0;
 	double target_y = s(target_x);
+	// vector<double> target_sd = getFrenet(target_x, target_y, ref_yaw, map_waypoints_x, map_waypoints_y);
+	// double target_s = target_sd[0];
+	// vector<double> ref_sd = getFrenet(ref_x, ref_y, ref_yaw, map_waypoints_x, map_waypoints_y);
+	// double ref_s = ref_sd[0];
+
+
 	double target_dist = sqrt(target_x * target_x + target_y * target_y);
 	double x_add_on = 0;
 	for (int i = 1; i < 100 - path_size; i ++)
@@ -243,7 +249,7 @@ double path_plan_strategy5(
 		car_s = end_path_s;
 	
 	bool tooclose = false;
-	cout <<"sensor fusion: " << endl;
+	// cout <<"sensor fusion: " << endl;
 	for (int i = 0; i < sensor_fusion.size(); i ++)
 	{
 		double obs_car_id = sensor_fusion[i][0];
