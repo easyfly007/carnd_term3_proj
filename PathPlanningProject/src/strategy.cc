@@ -233,7 +233,7 @@ void path_plan_strategy4(
 // add sensor fusion, check the other cars, lower down the ref speed 
 double path_plan_strategy5(
 	vector<double> &next_x_vals, vector<double> &next_y_vals, 
-	double car_yaw, double car_s, double car_d, double car_x, double car_y, double ref_v,
+	double car_yaw, double car_s, double car_d, double car_x, double car_y, double ref_v, double car_v,
 	vector<double> &previous_path_x, vector<double> &previous_path_y,
 	double end_path_s, double end_path_d,
 	vector<double> &map_waypoints_x,
@@ -251,8 +251,13 @@ double path_plan_strategy5(
 		car_s = end_path_s;
 	
 	bool tooclose = false;
-	// cout <<"sensor fusion: " << endl;
-	for (int i = 0; i < sensor_fusion.size(); i ++)
+	// safe_dist will be based on the car speed
+	// we given a 3 seconds response time
+	double safe_dist = car_v * 2.0;
+	if (safe_dist < 30)
+		safe_dist = 30.0;
+	cout << "car_v = " << car_v << ", safe dist = " << safe_dist << endl;
+ 	for (int i = 0; i < sensor_fusion.size(); i ++)
 	{
 		double obs_car_id = sensor_fusion[i][0];
 		double obs_car_x  = sensor_fusion[i][1];
@@ -261,31 +266,43 @@ double path_plan_strategy5(
 		double obs_car_vy = sensor_fusion[i][4];
 		double obs_car_s  = sensor_fusion[i][5];
 		double obs_car_d  = sensor_fusion[i][6];
+		double obs_car_v  = sqrt(obs_car_vx*obs_car_vx + obs_car_vy*obs_car_vy);
+
 		// for (int j = 0; j < sensor_fusion[i].size(); j ++)
 		// {
 		// 	cout << " " << j << "=" << sensor_fusion[i][j];
 		// }
 		// cout << endl;
 		// check if in the same lane
-		if (obs_car_d < lane * 4 && obs_car_d < lane * 4 + 4)
+		if (obs_car_d < lane * 4 && obs_car_d < lane * 4 + 4 )
 		{
-			double check_speed = sqrt(obs_car_vx*obs_car_vx + obs_car_vy*obs_car_vy);
-			double check_car_s = obs_car_s;
-			check_car_s += prev_size * 0.02 * check_speed;
-			// we will check in a futuer s range that if ego car and checked are will collision
-			if (check_car_s > car_s && check_car_s - car_s < 30)
+			if (obs_car_v <= car_v && obs_car_s >= car_s && obs_car_s < car_s + safe_dist)
+			{
+				cout << " a car in the safe_dist range, car_s = " << car_s << ", obs car s = " << obs_car_s <<  ", with speed = " << obs_car_v << endl;
 				tooclose = true;
+			}
+			else if (obs_car_s > car_s)
+			{
+				double check_car_s = obs_car_s + prev_size * 0.02 * obs_car_v;
+				// we will check in a futuer s range that if ego car and checked are will collision
+				if (check_car_s > car_s && check_car_s - car_s < 30)
+				{
+					cout << " a car in a future range will collision, car_s = " << car_s << ", obs car s = " << obs_car_s << endl;
+					tooclose = true;
+				}
+			}
 		}
 	}
+
 	if (tooclose)
 	{
 		ref_v -= 0.25;
-		cout << " slow down speed to avoid collision" << endl;
+		cout << " slow down speed to " << ref_v << " to avoid collision" << endl;
 	}
 	else if (ref_v < 49.5 - 0.45)
 	{
-		cout << " speed up speed to meet 49.5 " << endl;
 		ref_v += 0.45;
+		cout << " speed up speed to " << ref_v << endl;
 	}
 
 	return ref_v;
