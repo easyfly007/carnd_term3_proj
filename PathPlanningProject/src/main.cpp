@@ -259,8 +259,10 @@ int main() {
 			// path_plan_strategy3(next_x_vals, next_y_vals, car_yaw, car_x, car_y, 
 			// 	previous_path_x, previous_path_y,
 			// 	map_waypoints_x, map_waypoints_y,map_waypoints_s, map_waypoints_dx, map_waypoints_dy);
+			int target_lane = 1;
 			ref_v =  path_plan_strategy5(
-				next_x_vals, next_y_vals, car_yaw, car_s, car_d, car_x, car_y, ref_v, car_speed,
+				next_x_vals, next_y_vals, target_lane, 
+				car_yaw, car_s, car_d, car_x, car_y, ref_v, car_speed,
 				previous_path_x, previous_path_y, end_path_s, end_path_d, map_waypoints_x,
 				map_waypoints_y, map_waypoints_s, map_waypoints_dx, map_waypoints_dy, sensor_fusion);
 
