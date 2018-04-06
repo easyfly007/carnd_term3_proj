@@ -17,6 +17,8 @@ extern vector<double> getFrenet(double x, double y, double theta,
 extern vector<double> getXY(double s, double d, const vector<double> &maps_s, 
 	const vector<double> &maps_x, const vector<double> &maps_y);
 
+const int max_path_points = 80;
+
 int getLane(double d)
 {
 	return 1;
@@ -35,7 +37,7 @@ void path_plan_strategy1(vector<double> &next_x_vals, vector<double> &next_y_val
 
 	// make the car move in a straight line
 	double dist_inc = 0.225;
-	for (int i = 1; i < 100; i ++)
+	for (int i = 1; i < max_path_points; i ++)
 	{
 		next_x_vals.push_back(car_x + (dist_inc * i) * cos(deg2rad(car_yaw)) );
 		next_y_vals.push_back(car_y + (dist_inc * i) * sin(deg2rad(car_yaw)));
@@ -76,7 +78,7 @@ void path_plan_strategy2(vector<double> &next_x_vals, vector<double> &next_y_val
 		angle = atan2(pos_y - pos_y2, pos_x - pos_x2);
 	}
 
-	for (int i = 0; i < 100 - path_size; i ++)
+	for (int i = 0; i < max_path_points - path_size; i ++)
 	{
 		next_x_vals.push_back(pos_x + dist_inc * cos(angle + (i + 1) * pi() / 100));
 		next_y_vals.push_back(pos_y + dist_inc * sin(angle + (i + 1) * pi() / 100));
@@ -112,7 +114,7 @@ void path_plan_strategy3(
 	vector<double> pos_sd = getFrenet(pos_x, pos_y, angle, map_waypoints_x, map_waypoints_y);
 	double pos_s = pos_sd[0];
 	double pos_d = pos_sd[1];
-	for (int i = 0; i < 100; i ++)
+	for (int i = 0; i < max_path_points; i ++)
 	{
 		double next_s = pos_s + (i + 1) * dist_inc;
 		double next_d = pos_d;
@@ -210,7 +212,7 @@ void path_plan_strategy4(
 
 	double target_dist = sqrt(target_x * target_x + target_y * target_y);
 	double x_add_on = 0;
-	for (int i = 1; i < 100 - path_size; i ++)
+	for (int i = 1; i < max_path_points - path_size; i ++)
 	{
 		double N = target_dist / (0.02 * ref_v / 2.24);
 		double x_point = i * (target_x / N);
