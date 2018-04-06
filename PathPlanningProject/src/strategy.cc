@@ -126,10 +126,61 @@ void path_plan_strategy3(
 	}
 }
 
+bool is_target_lane_safe(int target_lane, const vector<vector<double> > & sensor_fusion,
+	double car_yaw, double car_s, double car_d, double car_v, int prev_size)
+{
+	double safe_dist_ahead = car_v * 2.0;
+	if (safe_dist_ahead < 30)
+		safe_dist_ahead = 30;
+	double safe_dist_behind = 30;
+	
+	for (int i = 0; i < sensor_fusion.size(); i ++)
+	{
+		double obs_car_id = sensor_fusion[i][0];
+		double obs_car_x  = sensor_fusion[i][1];
+		double obs_car_y  = sensor_fusion[i][2];
+		double obs_car_vx = sensor_fusion[i][3];
+		double obs_car_vy = sensor_fusion[i][4];
+		double obs_car_s  = sensor_fusion[i][5];
+		double obs_car_d  = sensor_fusion[i][6];
+		double obs_car_v  = sqrt(obs_car_vx*obs_car_vx + obs_car_vy*obs_car_vy);
+
+		if (obs_car_d < target_lane * 4 && obs_car_d <target_lane * 4 + 4 )
+		{
+			if (obs_car_v <= car_v && obs_car_s >= car_s && obs_car_s < car_s + safe_dist_ahead)
+			{
+				cout << "not safe 1, target_lane= " << target_lane << endl;
+				return false;
+			}
+			else if (obs_car_s > car_s)
+			{
+				double check_car_s = obs_car_s + prev_size * 0.02 * obs_car_v;
+				// we will check in a futuer s range that if ego car and checked are will collision
+				if (check_car_s > car_s && check_car_s - car_s < 30)
+				{
+					cout << "not safe 2, target lane = " << target_lane << endl;
+					return false;
+				}
+			}
+			else
+			{
+				// check car behind 
+				if (obs_car_s + safe_dist_behind > car_s && obs_car_v > car_v-0.2)
+				{
+					cout << "not safe 3, target_lane = " << target_lane << endl;
+					return false;
+				}
+
+			}
+		}
+	}
+	return true;
+}
+
 
 // smooth the line
 void path_plan_strategy4(
-	vector<double> &next_x_vals, vector<double> &next_y_vals, 
+	vector<double> &next_x_vals, vector<double> &next_y_vals, int target_lane,
 	double car_yaw, double car_s, double car_d, double car_x, double car_y, double ref_v,
 	vector<double> &previous_path_x, vector<double> &previous_path_y,
 	vector<double> &map_waypoints_x,
@@ -167,11 +218,11 @@ void path_plan_strategy4(
 		ptsy.push_back(ref_y);
 	}
 
-	vector<double> next_wp0 = getXY(car_s + 30, 4*lane + 2, 
+	vector<double> next_wp0 = getXY(car_s + 30, 4 * target_lane + 2, 
 		map_waypoints_s, map_waypoints_x,map_waypoints_y);
-	vector<double> next_wp1 = getXY(car_s + 60, 4*lane +2, 
+	vector<double> next_wp1 = getXY(car_s + 60, 4 * target_lane +2, 
 		map_waypoints_s, map_waypoints_x,map_waypoints_y);
-	vector<double> next_wp2 = getXY(car_s + 90, 4*lane + 2, 
+	vector<double> next_wp2 = getXY(car_s + 90, 4 * target_lane + 2, 
 		map_waypoints_s, map_waypoints_x,map_waypoints_y);
 	
 	// data points for smoothing
@@ -231,8 +282,9 @@ void path_plan_strategy4(
 
 
 // add sensor fusion, check the other cars, lower down the ref speed 
+// also decide the target lane
 double path_plan_strategy5(
-	vector<double> &next_x_vals, vector<double> &next_y_vals, int &target_lane,
+	vector<double> &next_x_vals, vector<double> &next_y_vals, int &lane, int last_lane,
 	double car_yaw, double car_s, double car_d, double car_x, double car_y, double ref_v, double car_v,
 	const vector<double> &previous_path_x, const vector<double> &previous_path_y,
 	double end_path_s, double end_path_d,
@@ -243,8 +295,7 @@ double path_plan_strategy5(
 	const vector<double> &map_waypoints_dy,
 	const vector<vector<double> > &sensor_fusion)
 {
-	int lane = getLane(car_d);
-	// sensorfusion
+	// sensor_fusion
 	// [id, x, y, vx, vy, s, d]
 	int prev_size = previous_path_x.size();
 	if (prev_size > 0)
@@ -256,7 +307,7 @@ double path_plan_strategy5(
 	double safe_dist = car_v * 2.0;
 	if (safe_dist < 30)
 		safe_dist = 30.0;
-	cout << "car_v = " << car_v << ", safe dist = " << safe_dist << endl;
+	cout << "lane = " << lane << ", car_v = " << car_v << ", safe dist = " << safe_dist << endl;
  	for (int i = 0; i < sensor_fusion.size(); i ++)
 	{
 		double obs_car_id = sensor_fusion[i][0];
@@ -294,10 +345,20 @@ double path_plan_strategy5(
 		}
 	}
 
-	if (tooclose)
+	if (tooclose && ref_v > 10.)
 	{
 		ref_v -= 0.25;
 		cout << " slow down speed to " << ref_v << " to avoid collision" << endl;
+		if (lane > 0)
+		{
+			cout << "switch lane from lane " << lane << " to lane " << lane - 1 << endl;
+			lane = lane - 1;
+		}
+		else
+		{
+			cout << "switch lane from lane " << lane << " to lane " << lane + 1 << endl;
+			lane = lane + 1;
+		}
 	}
 	else if (ref_v < 49.5 - 0.45)
 	{
@@ -307,3 +368,5 @@ double path_plan_strategy5(
 
 	return ref_v;
 }
+
+
