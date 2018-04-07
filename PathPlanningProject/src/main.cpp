@@ -269,7 +269,7 @@ int main() {
 				map_waypoints_y, map_waypoints_s, map_waypoints_dx, map_waypoints_dy, sensor_fusion);
 
 			path_plan_strategy4(
-				next_x_vals, next_y_vals, lane, 
+				next_x_vals, next_y_vals, last_lane, lane, 
 				car_yaw, car_s, car_d, car_x, car_y, ref_v,
 				previous_path_x, previous_path_y,
 				map_waypoints_x, map_waypoints_y, map_waypoints_s,map_waypoints_dx, map_waypoints_dy);

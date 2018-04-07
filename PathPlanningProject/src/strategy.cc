@@ -145,7 +145,7 @@ bool is_target_lane_safe(int target_lane, const vector<vector<double> > & sensor
 		double obs_car_d  = sensor_fusion[i][6];
 		double obs_car_v  = sqrt(obs_car_vx*obs_car_vx + obs_car_vy*obs_car_vy);
 
-		if (obs_car_d < target_lane * 4 && obs_car_d <target_lane * 4 + 4 )
+		if (obs_car_d > target_lane * 4 && obs_car_d <target_lane * 4 + 4 )
 		{
 			if (obs_car_v <= car_v && obs_car_s >= car_s && obs_car_s < car_s + safe_dist_ahead)
 			{
@@ -179,7 +179,7 @@ bool is_target_lane_safe(int target_lane, const vector<vector<double> > & sensor
 
 // smooth the line
 void path_plan_strategy4(
-	vector<double> &next_x_vals, vector<double> &next_y_vals, int target_lane,
+	vector<double> &next_x_vals, vector<double> &next_y_vals, int current_lane, int target_lane,
 	double car_yaw, double car_s, double car_d, double car_x, double car_y, double ref_v,
 	vector<double> &previous_path_x, vector<double> &previous_path_y,
 	vector<double> &map_waypoints_x,
@@ -216,12 +216,12 @@ void path_plan_strategy4(
 		ptsx.push_back(ref_x);
 		ptsy.push_back(ref_y);
 	}
-
-	vector<double> next_wp0 = getXY(car_s + 30, 4 * target_lane + 2, 
+	double safe_dist = ref_v;
+	vector<double> next_wp0 = getXY(car_s + ref_v * 1, 4 * target_lane + 2,
 		map_waypoints_s, map_waypoints_x,map_waypoints_y);
-	vector<double> next_wp1 = getXY(car_s + 60, 4 * target_lane +2, 
+	vector<double> next_wp1 = getXY(car_s + ref_v * 2, 4 * target_lane + 2, 
 		map_waypoints_s, map_waypoints_x,map_waypoints_y);
-	vector<double> next_wp2 = getXY(car_s + 90, 4 * target_lane + 2, 
+	vector<double> next_wp2 = getXY(car_s + ref_v * 3, 4 * target_lane + 2, 
 		map_waypoints_s, map_waypoints_x,map_waypoints_y);
 	
 	// data points for smoothing
@@ -245,6 +245,7 @@ void path_plan_strategy4(
 
 	tk::spline s;
 	s.set_points(ptsx, ptsy);
+	
 	for (int i = 0; i < path_size; i ++)
 	{
 		next_x_vals.push_back(previous_path_x[i]);
@@ -297,8 +298,8 @@ double path_plan_strategy5(
 	// sensor_fusion
 	// [id, x, y, vx, vy, s, d]
 	int prev_size = previous_path_x.size();
-	if (prev_size > 0)
-		car_s = end_path_s;
+	// if (prev_size > 0)
+		// car_s = end_path_s;
 	
 	bool tooclose = false;
 	// safe_dist will be based on the car speed
@@ -341,41 +342,48 @@ double path_plan_strategy5(
 		}
 	}
 
-	if (tooclose && ref_v > 10.0)
+	if (tooclose)
 	{
 		cout << " too close, slow down ref_v from " << ref_v << " to " << ref_v - 0.25 << endl;
-		ref_v -= 0.25;
-
-		if (ref_v < 40 && lane == 0 && 
+		ref_v -= 0.225;
+		bool lane_switch = false;
+		if (lane == 0 && ref_v < 47 &&
 			is_target_lane_safe(1, sensor_fusion, car_yaw, car_s, car_d, car_v, prev_size))
 		{
 			lane = 1;
+			lane_switch = true;
 			cout << "switch from lane 0 to lane 1" << endl;
 		}
-		else if (ref_v < 40 && lane == 2 && 
+		else if ( lane == 2 &&  ref_v < 47 &&
 			is_target_lane_safe(1, sensor_fusion, car_yaw, car_s, car_d, car_v, prev_size))
 		{
+			lane_switch = true;
 			lane = 1;
 			cout << "switch from lane 2 to lane 1" << endl;
 		}
 		else if (lane == 1)
 		{
-			if (ref_v < 40 && is_target_lane_safe(0, sensor_fusion, car_yaw, car_s, car_d, car_v, prev_size))
+			if (  ref_v < 47 &&
+				is_target_lane_safe(0, sensor_fusion, car_yaw, car_s, car_d, car_v, prev_size))
 			{
+				lane_switch = true;
 				lane = 0;
 				cout << "switch from lane 1 to lane 0" << endl;
 			}
-			else if (ref_v < 40 && is_target_lane_safe(2, sensor_fusion, car_yaw, car_s, car_d, car_v, prev_size))
+			else if ( ref_v < 47 &&
+			 is_target_lane_safe(2, sensor_fusion, car_yaw, car_s, car_d, car_v, prev_size))
 			{
+				lane_switch = true;
 				lane = 2;
 				cout << "switch from lane 1 to lane 2" << endl;
 			}
 		}
+
 	}
-	else if (ref_v < 49.5 - 0.45)
+	else if (ref_v < 49.0 - 0.45)
 	{
-		ref_v += 0.45;
-		cout << " speed up speed to " << ref_v << endl;
+		ref_v += 0.225;
+		cout << " speed up ref_v to " << ref_v << endl;
 	}
 
 	return ref_v;
