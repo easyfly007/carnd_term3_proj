@@ -34,42 +34,57 @@ we implemented this one step by one, more and more powerful and complex.
 see the codes in function strategy 1
 
 2. keep turing a circle startegy
+
 see the code in function strategy 2
+
 we will manually calc the car orientation angle from the previous points and calc the car pos and angle from previous points, then also keep the straight lane direction
 
 3. keep in the lane strategy
+
 see the coe in function strategy 3
+
 just keep the s increasing and d un-changed
 
-4. need to try to make the future points smooth that in case we meet a sharp turn, we can still meet the jerk requirement
+4. smooth future path points generation
+
 see the code in function strtegy 4.
+
+in case we meet a sharp turn, we can still meet the jerk requirement
 spline function used to help for the interpolation
 use 80 points for the future points number.
 
 I tried several different path point numbers,
+
 use 50, which induce speed = 0 error, as the simulator will consume more than 50 points between 2 update from the server.
 use 100, in condition there's a sharp turn, such long range prediction is not reliable.
+
 800 in my test is fine.
 
 
-
-
 5. use sensor fusion and detect if there's a slow car in the front of ego
-then decide to slow down the car to avoid collision
+
 see code in function strategy 5.
+
+then decide to slow down the car to avoid collision
 I introduced a safe_distance concept, which depends on the speed, as 1s * speed.
 e.g., a driver will alays have 1s response time to take action before collision.
 
 
 6. use gradually update the ref velocity to avoid jerk.
+
 also see code in function strategy 5.
+
 when the front path is safe, speed up by 0.225 m/s
+
 when the front path is not safe, slow down by 0.225 m/s
 
 7. switch lane strategy
+
 see the help function is_target_lane_safe() to check if it's safe to switch to the neighbor lane.
+
 switch lane only at condition that the target lane is safe, and speed is loweer than 48./
 the speed limitation is that:
+
 when we switch a lane, even our ref velocity is under 50m/s,
 that the predicted lane path points will not be a flat straight lane in the car-coordinate,
 thus will induce higher actual speed. we need to give more safe space for the speed.
