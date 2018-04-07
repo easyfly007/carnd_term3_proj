@@ -149,7 +149,7 @@ bool is_target_lane_safe(int target_lane, const vector<vector<double> > & sensor
 		{
 			if (obs_car_v <= car_v && obs_car_s >= car_s && obs_car_s < car_s + safe_dist_ahead)
 			{
-				cout << "not safe 1, target_lane= " << target_lane << endl;
+				cout << "try to switch lane, target_lane= " << target_lane << " not safe" << endl;
 				return false;
 			}
 			else if (obs_car_s > car_s)
@@ -158,7 +158,7 @@ bool is_target_lane_safe(int target_lane, const vector<vector<double> > & sensor
 				// we will check in a futuer s range that if ego car and checked are will collision
 				if (check_car_s > car_s && check_car_s - car_s < 30)
 				{
-					cout << "not safe 2, target lane = " << target_lane << endl;
+					cout << "try to switch lane, target lane = " << target_lane << " not safe" << endl;
 					return false;
 				}
 			}
@@ -167,7 +167,7 @@ bool is_target_lane_safe(int target_lane, const vector<vector<double> > & sensor
 				// check car behind 
 				if (obs_car_s + safe_dist_behind > car_s && obs_car_v > car_v-0.2)
 				{
-					cout << "not safe 3, target_lane = " << target_lane << endl;
+					cout << "try to switch lane, target_lane = " << target_lane << " not safe" << endl;
 					return false;
 				}
 			}
@@ -378,6 +378,12 @@ double path_plan_strategy5(
 				cout << "switch from lane 1 to lane 2" << endl;
 			}
 		}
+		
+		// in case there's a slow care in fron of us and the target lane is not safe,
+		// slow down more to avoid collision
+		if (lane_switch == false)
+			ref_v -= 0.225;
+
 
 	}
 	else if (ref_v < 49.0 - 0.45)
