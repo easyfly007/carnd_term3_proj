@@ -309,6 +309,7 @@ double path_plan_strategy5(
 	// 	safe_dist = 30.0;
 
 	cout << "lane = " << lane << ", car_v = " << car_v << ", safe dist = " << safe_dist << endl;
+	double front_car_v = 0.;
  	for (int i = 0; i < sensor_fusion.size(); i ++)
 	{
 		double obs_car_id = sensor_fusion[i][0];
@@ -327,6 +328,7 @@ double path_plan_strategy5(
 				cout << " a car in the safe_dist range, car_s = " << car_s 
 					<< ", obs car s = " << obs_car_s <<  ", with speed = " << obs_car_v << endl;
 				tooclose = true;
+				front_car_v = obs_car_v;
 			}
 			else if (obs_car_s > car_s)
 			{
@@ -337,6 +339,7 @@ double path_plan_strategy5(
 					cout << " a car in a future range will collision, car_s = " 
 						<< car_s << ", obs car s = " << obs_car_s << endl;
 					tooclose = true;
+					front_car_v = obs_car_v;
 				}
 			}
 		}
@@ -345,7 +348,8 @@ double path_plan_strategy5(
 	if (tooclose)
 	{
 		cout << " too close, slow down ref_v from " << ref_v << " to " << ref_v - 0.25 << endl;
-		ref_v -= 0.225;
+		
+
 		bool lane_switch = false;
 		if (lane == 0 && ref_v < 47 &&
 			is_target_lane_safe(1, sensor_fusion, car_yaw, car_s, car_d, car_v, prev_size))
@@ -381,10 +385,9 @@ double path_plan_strategy5(
 		
 		// in case there's a slow care in fron of us and the target lane is not safe,
 		// slow down more to avoid collision
-		if (lane_switch == false)
-			ref_v -= 0.225;
-
-
+		double speed_diff = ref_v - front_car_v;
+		ref_v -= 0.225;
+		ref_v -= speed_diff * 0.05;
 	}
 	else if (ref_v < 49.0 - 0.45)
 	{
