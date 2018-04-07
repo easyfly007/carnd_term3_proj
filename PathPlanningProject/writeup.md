@@ -24,28 +24,57 @@ Each waypoint in the list contains  [x,y,s,dx,dy] values. x and y are the waypoi
 
 The highway's waypoints loop around so the frenet s value, distance along the road, goes from 0 to 6945.554.
 
-####
+
+#### implementation
 we implemented this one step by one, more and more powerful and complex.
 (I implemented step by step, but only the final codes left in the repo)
 
 1. make the car move in a straight line
- see the commented codes for strategy 1
+
+see the codes in function strategy 1
 
 2. keep turing a circle startegy
+see the code in function strategy 2
 we will manually calc the car orientation angle from the previous points and calc the car pos and angle from previous points, then also keep the straight lane direction
 
 3. keep in the lane strategy
-see the commented codes for strategy 3
+see the coe in function strategy 3
 just keep the s increasing and d un-changed
 
 4. need to try to make the future points smooth that in case we meet a sharp turn, we can still meet the jerk requirement
+see the code in function strtegy 4.
+spline function used to help for the interpolation
+use 80 points for the future points number.
 
-I use the way aaron suggested that use a far away points (still in the middle of the lane), and then interplate the future time points.
-spline.h file will be help to finish this.
+I tried several different path point numbers,
+use 50, which induce speed = 0 error, as the simulator will consume more than 50 points between 2 update from the server.
+use 100, in condition there's a sharp turn, such long range prediction is not reliable.
+800 in my test is fine.
 
 
-4. use sensor fusion and detect if there's a slow car in the front of ego
-then decide to slow down the car to avoid colision
+
+
+5. use sensor fusion and detect if there's a slow car in the front of ego
+then decide to slow down the car to avoid collision
+see code in function strategy 5.
+I introduced a safe_distance concept, which depends on the speed, as 1s * speed.
+e.g., a driver will alays have 1s response time to take action before collision.
+
+
+6. use gradually update the ref velocity to avoid jerk.
+also see code in function strategy 5.
+when the front path is safe, speed up by 0.225 m/s
+when the front path is not safe, slow down by 0.225 m/s
+
+7. switch lane strategy
+see the help function is_target_lane_safe() to check if it's safe to switch to the neighbor lane.
+switch lane only at condition that the target lane is safe, and speed is loweer than 48./
+the speed limitation is that:
+when we switch a lane, even our ref velocity is under 50m/s,
+that the predicted lane path points will not be a flat straight lane in the car-coordinate,
+thus will induce higher actual speed. we need to give more safe space for the speed.
+
+
 
 
 ## Basic Build Instructions
