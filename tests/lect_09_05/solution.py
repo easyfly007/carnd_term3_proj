@@ -1,3 +1,4 @@
+print(19.0/12/3)
 import numpy as np
 import oldtensorflow as tf
 

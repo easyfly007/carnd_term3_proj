@@ -9,7 +9,7 @@ def upsample(x):
     :return: TF Operation
     """
     # TODO: Use `tf.layers.conv2d_transpose`
-    return None
+    return tf.layers.conv2d_transpose(inputs = x, num_output = 3, kernel_size = (2, 2), stride = (2, 2))
 
 
 x = tf.constant(np.random.randn(1, 4, 4, 3), dtype=tf.float32)
