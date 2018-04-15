@@ -58,23 +58,40 @@ def layers(vgg_layer3_out, vgg_layer4_out, vgg_layer7_out, num_classes):
     print('vgg_layer4_out shape = ', vgg_layer4_out.shape)
     print('vgg_layer7_out shape = ', vgg_layer7_out.shape)
     
-    conv_1x1 = tf.layers.conv2d(vgg_layer7_out,
-        filter = num_classes, strides = 1, padding = 'same', activation = 'relu',
+    output_layer7_1x1 = tf.layers.conv2d(vgg_layer7_out,
+        filters = num_classes, kernel_size = 1, strides = 1, padding = 'same', #activation = 'relu',
         kernel_regularizer = tf.contrib.layers.l2_regularizer(1e-3))
-    print('conv_1x1 shape = ', conv_1x1.shape)
-    
-    output_layer4 = tf.layers.conv2d_transpose(conv_1x1, filter = num_classes, 
-        output_shape = 4, strides = 2, padding = 'same',
+    print('output_layer7_1x1 shape = ', output_layer7_1x1.shape)
+
+
+    output_layer4 = tf.layers.conv2d_transpose(output_layer7_1x1, filters = num_classes, 
+        kernel_size = 4, strides = 2, padding = 'same',
         kernel_regularizer = tf.contrib.layers.l2_regularizer(1e-3))
     print('output_layer4 shape = ', output_layer4.shape)
+
+    vgg_layer4_1x1 = tf.layers.conv2d(vgg_layer4_out,
+    	filters = num_classes, kernel_size = 1, strides = 1, padding = 'same',
+    	kernel_regularizer = tf.contrib.layers.l2_regularizer(1e-3))
+    print('vgg_layer4_1x1 shape = ', vgg_layer4_1x1.shape)
     
-    output_layer4_add = tf.layers.add(output_layer4, vgg_layer4_out)
+    output_layer4_add = tf.add(output_layer4, vgg_layer4_1x1)
     print('output_layer4_add shape = ', output_layer4_add.shape)
 
-    return output_layer4_add
+
+    output_layer3 = tf.layers.conv2d_transpose(output_layer4_add, filters = num_classes,
+    	kernel_size = 4, strides = 2, padding = 'same',
+    	kernel_regularizer = tf.contrib.layers.l2_regularizer(1e-3))
+    print('output_layer3 shape = ', output_layer3.shape)
+
+    vgg_layer3_1x1 = tf.layers.conv2d(vgg_layer3_out,
+    	filters = num_classes, kernel_size = 1, strides = 1, padding = 'same',
+    	kernel_regularizer = tf.contrib.layers.l2_regularizer(1e-3))
+    output_layer3_add = tf.add(output_layer3, vgg_layer3_1x1)
+
+    return output_layer3_add
+
 
 tests.test_layers(layers)
-
 
 def optimize(nn_last_layer, correct_label, learning_rate, num_classes):
     """
