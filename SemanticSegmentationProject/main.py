@@ -34,8 +34,8 @@ def load_vgg(sess, vgg_path):
     vgg_layer3_out_tensor_name = 'layer3_out:0'
     vgg_layer4_out_tensor_name = 'layer4_out:0'
     vgg_layer7_out_tensor_name = 'layer7_out:0'
-
-    print('load vgg file from vgg_path =', vgg_path)
+    if dbg:
+    	print('load vgg file from vgg_path =', vgg_path)
     tf.saved_model.loader.load(sess, [vgg_tag], vgg_path)
     graph = tf.get_default_graph()
     vgg_input = graph.get_tensor_by_name(vgg_input_tensor_name)
@@ -48,7 +48,6 @@ def load_vgg(sess, vgg_path):
     	print('vgg_input shape = ', vgg_input.shape)
     return vgg_input, vgg_keepprob, vgg_layer3_out, vgg_layer4_out, vgg_layer7_out
 tests.test_load_vgg(load_vgg, tf)
-
 
 def layers(vgg_layer3_out, vgg_layer4_out, vgg_layer7_out, num_classes):
     """
@@ -114,8 +113,9 @@ def optimize(nn_last_layer, correct_label, learning_rate, num_classes):
     :return: Tuple of (logits, train_op, cross_entropy_loss)
     """
     # TODO: Implement function
-    print('nn_last_layer shape = ', nn_last_layer.shape)
-    print('correct_label shape = ', correct_label.shape)
+    if dbg:
+    	print('nn_last_layer shape = ', nn_last_layer.shape)
+    	print('correct_label shape = ', correct_label.shape)
     correct_label_reshaped = tf.reshape(correct_label, (-1, num_classes))
     logits = tf.reshape(nn_last_layer, (-1, num_classes))
     cross_entropy_loss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(
@@ -142,7 +142,8 @@ def train_nn(sess, epochs, batch_size, get_batches_fn, train_op, cross_entropy_l
     :param learning_rate: TF Placeholder for learning rate
     """
     # TODO: Implement function
-    print('epochs = ', epochs)
+    if dbg:
+    	print('epochs = ', epochs)
     for epoch in range(epochs):
     	for labels, images in get_batches_fn(batch_size):
     		sess.run(train_op, feed_dict = {
@@ -177,9 +178,10 @@ def run():
         #  https://datascience.stackexchange.com/questions/5224/how-to-prepare-augment-images-for-neural-network
 
         # TODO: Build NN using load_vgg, layers, and optimize function
+        print('vgg_path = ', vgg_path)
         vgg_input, vgg_keepprob, vgg_layer3_out, vgg_layer4_out, vgg_layer7_out = load_vgg(sess, vgg_path)
         output = layers(vgg_layer3_out, vgg_layer4_out, vgg_layer7_out, num_classes)
-        print('step 2')
+        print('step 3')
         logits, train_op, cross_entropy_loss = optimize(output, correct_label, learning_rate, num_classes)
 
         # TODO: Train NN using the train_nn function
