@@ -5,6 +5,8 @@ import warnings
 from distutils.version import LooseVersion
 import project_tests as tests
 
+dbg = 1
+
 
 # Check TensorFlow Version
 assert LooseVersion(tf.__version__) >= LooseVersion('1.0'), 'Please use TensorFlow version 1.0 or newer.  You are using {}'.format(tf.__version__)
@@ -42,8 +44,11 @@ def load_vgg(sess, vgg_path):
     vgg_layer4_out = graph.get_tensor_by_name(vgg_layer4_out_tensor_name)
     vgg_layer7_out = graph.get_tensor_by_name(vgg_layer7_out_tensor_name)
 
+    if dbg:
+    	print('vgg_input shape = ', vgg_input.shape)
     return vgg_input, vgg_keepprob, vgg_layer3_out, vgg_layer4_out, vgg_layer7_out
 tests.test_load_vgg(load_vgg, tf)
+
 
 def layers(vgg_layer3_out, vgg_layer4_out, vgg_layer7_out, num_classes):
     """
@@ -55,42 +60,47 @@ def layers(vgg_layer3_out, vgg_layer4_out, vgg_layer7_out, num_classes):
     :return: The Tensor for the last layer of output
     """
     # TODO: Implement function
+    '''
     print('vgg_layer3_out shape = ', vgg_layer3_out.shape)
     print('vgg_layer4_out shape = ', vgg_layer4_out.shape)
     print('vgg_layer7_out shape = ', vgg_layer7_out.shape)
-    
+    '''
+
     output_layer7_1x1 = tf.layers.conv2d(vgg_layer7_out,
         filters = num_classes, kernel_size = 1, strides = 1, padding = 'same', #activation = 'relu',
         kernel_regularizer = tf.contrib.layers.l2_regularizer(1e-3))
-    print('output_layer7_1x1 shape = ', output_layer7_1x1.shape)
+    # print('output_layer7_1x1 shape = ', output_layer7_1x1.shape)
 
 
     output_layer4 = tf.layers.conv2d_transpose(output_layer7_1x1, filters = num_classes, 
         kernel_size = 4, strides = 2, padding = 'same',
         kernel_regularizer = tf.contrib.layers.l2_regularizer(1e-3))
-    print('output_layer4 shape = ', output_layer4.shape)
+    # print('output_layer4 shape = ', output_layer4.shape)
 
     vgg_layer4_1x1 = tf.layers.conv2d(vgg_layer4_out,
     	filters = num_classes, kernel_size = 1, strides = 1, padding = 'same',
     	kernel_regularizer = tf.contrib.layers.l2_regularizer(1e-3))
-    print('vgg_layer4_1x1 shape = ', vgg_layer4_1x1.shape)
+    # print('vgg_layer4_1x1 shape = ', vgg_layer4_1x1.shape)
     
     output_layer4_add = tf.add(output_layer4, vgg_layer4_1x1)
-    print('output_layer4_add shape = ', output_layer4_add.shape)
+    # print('output_layer4_add shape = ', output_layer4_add.shape)
 
 
     output_layer3 = tf.layers.conv2d_transpose(output_layer4_add, filters = num_classes,
     	kernel_size = 4, strides = 2, padding = 'same',
     	kernel_regularizer = tf.contrib.layers.l2_regularizer(1e-3))
-    print('output_layer3 shape = ', output_layer3.shape)
+    # print('output_layer3 shape = ', output_layer3.shape)
 
     vgg_layer3_1x1 = tf.layers.conv2d(vgg_layer3_out,
     	filters = num_classes, kernel_size = 1, strides = 1, padding = 'same',
     	kernel_regularizer = tf.contrib.layers.l2_regularizer(1e-3))
     output_layer3_add = tf.add(output_layer3, vgg_layer3_1x1)
 
-    return output_layer3_add
+    output_layer1 = tf.layers.conv2d_transpose(output_layer3_add, filters = num_classes,
+    	kernel_size = 16, strides = 8, padding = 'same',
+    	kernel_regularizer = tf.contrib.layers.l2_regularizer(1e-3))
 
+    return output_layer1
 
 tests.test_layers(layers)
 
@@ -113,7 +123,7 @@ def optimize(nn_last_layer, correct_label, learning_rate, num_classes):
     train_op = tf.train.AdamOptimizer(learning_rate = learning_rate).minimize(cross_entropy_loss)
     return logits, train_op, cross_entropy_loss
 
-tests.test_optimize(optimize)
+# tests.test_optimize(optimize)
 
 
 def train_nn(sess, epochs, batch_size, get_batches_fn, train_op, cross_entropy_loss, input_image,
@@ -141,7 +151,7 @@ def train_nn(sess, epochs, batch_size, get_batches_fn, train_op, cross_entropy_l
     			keep_prob: 0.5,
     			learning_rate: 0.001 })
 
-tests.test_train_nn(train_nn)
+# tests.test_train_nn(train_nn)
 
 def run():
     num_classes = 2
@@ -160,8 +170,6 @@ def run():
     with tf.Session() as sess:
         # Path to vgg model
         vgg_path = os.path.join(data_dir, 'vgg')
-        # vgg_path = os.path.join(data_dir, '')
-        print('vgg_path = ', vgg_path)
         # Create function to get batches
         get_batches_fn = helper.gen_batch_function(os.path.join(data_dir, 'data_road/training'), image_shape)
 
@@ -171,6 +179,7 @@ def run():
         # TODO: Build NN using load_vgg, layers, and optimize function
         vgg_input, vgg_keepprob, vgg_layer3_out, vgg_layer4_out, vgg_layer7_out = load_vgg(sess, vgg_path)
         output = layers(vgg_layer3_out, vgg_layer4_out, vgg_layer7_out, num_classes)
+        print('step 2')
         logits, train_op, cross_entropy_loss = optimize(output, correct_label, learning_rate, num_classes)
 
         # TODO: Train NN using the train_nn function
