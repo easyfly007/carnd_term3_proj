@@ -97,7 +97,16 @@ ENV/
 # mkdocs documentation
 /site
 
+# dataset file 
+data/
+
+# model file
+*.pb
+variables/
+
+
 # mypy
+
 .mypy_cache/
 
 RUNS/
