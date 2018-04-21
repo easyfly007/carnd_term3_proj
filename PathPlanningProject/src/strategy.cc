@@ -21,7 +21,6 @@ const int max_path_points = 80;
 
 int getLane(double d)
 {
-	return 1;
 	if (0.0 <= d && d <= 4.0)
 		return 0;
 	if (4.0 <= d && d <= 8.0)
