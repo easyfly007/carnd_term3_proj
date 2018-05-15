@@ -201,39 +201,22 @@ bool is_target_lane_safe(int target_lane, const vector<vector<double> > & sensor
 
 		if (obs_car_d > target_lane * 4 && obs_car_d < target_lane * 4 + 4 )
 		{
-			if (obs_car_v <= car_v + 0.8)
+			if (obs_car_s < car_s + car_v && obs_car_s > car_s - 10)
 			{
-				// a slow car ahead
-				if (obs_car_s >= car_s - 8.0 && obs_car_s < car_s + safe_dist_ahead)
-				{
-					cout << "try to switch lane, target_lane = " 
-					<< target_lane << " not safe, a slow car at front " << endl;
-					return false;
-				}
+				cout << "try to switch lane, target_lane= " << target_lane << " not safe, a car in range" << endl;
+				return false; 
 			}
-			
-			if (obs_car_v >= car_v - 0.8)
+			else if (obs_car_v <= car_v + 0.2 && obs_car_s >= car_s - 5.0 && obs_car_s < car_s + safe_dist_ahead)
 			{
-				// a fast car behind
-				double check_car_s = obs_car_s + prev_size * 0.02 * obs_car_v;
-				// we will check in a futuer s range that if ego car and checked are will collision
-				if (obs_car_s < car_s + 8.0 && check_car_s > car_s && check_car_s - car_s < 50)
-				{
-					cout << "try to switch lane, target lane = " 
-					<< target_lane << " not safe, a fast car behind" << endl;
-					return false;
-				}
+				cout << "try to switch lane, target_lane= " << target_lane << " not safe" << endl;
+				return false;
 			}
-			else
+			else if (obs_car_v >= car_v - 0.2 && obs_car_s <= car_s + 5.0 && obs_car_s > car_s - 0.5 * (obs_car_v - car_v + 0.2))
 			{
-				// check car behind 
-				if (obs_car_s + safe_dist_behind > car_s && obs_car_v > car_v-0.2)
-				{
-					cout << "try to switch lane, target_lane = " << target_lane << " not safe" << endl;
-					return false;
-				}
+				cout << "try to switch lane, target lane = " << target_lane << " not safe" << endl;
+				return false;
 			}
-		}
+		}		
 	}
 	return true;
 }
@@ -279,7 +262,7 @@ void buildTrajectory(
 		ptsy.push_back(ref_y);
 	}
 	double previous_path_length = path_size * ref_v *0.02;
-	vector<double> next_wp0 = getXY(car_s + previous_path_length + ref_v * 1, 4 * target_lane + 2,
+	vector<double> next_wp0 = getXY(car_s + previous_path_length + ref_v * 1, 4 * (target_lane* 0.9 + 0.1 * current_lane) + 2,
 		map_waypoints_s, map_waypoints_x,map_waypoints_y);
 	vector<double> next_wp1 = getXY(car_s + previous_path_length + ref_v * 2, 4 * target_lane + 2, 
 		map_waypoints_s, map_waypoints_x,map_waypoints_y);
@@ -370,7 +353,7 @@ double behaviorControl(
 	bool tooclose = false;
 	// safe_dist will be based on the car speed
 	// we given a 3 seconds response time
-	double safe_dist = ref_v * 1.0 + 10.0;
+	double safe_dist = ref_v * 1.0 + 5.0;
 	cout << "lane = " << lane << ", ref_v = " << ref_v << ", safe dist = " << safe_dist << endl;
 	double front_car_v = 0.;
  	for (int i = 0; i < sensor_fusion.size(); i ++)
@@ -456,7 +439,7 @@ double behaviorControl(
 	}
 	else if (ref_v < 49.0)
 	{
-		ref_v += 0.205;
+		ref_v += 0.225;
 		cout << " speed up ref_v to " << ref_v << endl;
 	}
 
