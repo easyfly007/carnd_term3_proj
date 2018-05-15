@@ -206,15 +206,24 @@ bool is_target_lane_safe(int target_lane, const vector<vector<double> > & sensor
 				cout << "try to switch lane, target_lane= " << target_lane << " not safe, a car in range" << endl;
 				return false; 
 			}
-			else if (obs_car_v <= car_v + 0.2 && obs_car_s >= car_s - 5.0 && obs_car_s < car_s + safe_dist_ahead)
+			
+			if (obs_car_v <= car_v + 0.2)
 			{
-				cout << "try to switch lane, target_lane= " << target_lane << " not safe" << endl;
-				return false;
+				if ( obs_car_s >= car_s - 5.0 && obs_car_s < car_s + safe_dist_ahead)
+				{
+					cout << "try to switch lane, target_lane= " << target_lane << " not safe" << endl;
+					return false;
+				}
 			}
-			else if (obs_car_v >= car_v - 0.2 && obs_car_s <= car_s + 5.0 && obs_car_s > car_s - 0.5 * (obs_car_v - car_v + 0.2))
+
+
+			if (obs_car_v >= car_v - 0.2)
 			{
-				cout << "try to switch lane, target lane = " << target_lane << " not safe" << endl;
-				return false;
+				if (obs_car_s <= car_s + 5.0 && obs_car_s > car_s - 4.0 * (obs_car_v - car_v + 0.2))
+				{
+					cout << "try to switch lane, target lane = " << target_lane << " not safe" << endl;
+					return false;
+				}
 			}
 		}		
 	}
@@ -262,7 +271,7 @@ void buildTrajectory(
 		ptsy.push_back(ref_y);
 	}
 	double previous_path_length = path_size * ref_v *0.02;
-	vector<double> next_wp0 = getXY(car_s + previous_path_length + ref_v * 1, 4 * (target_lane* 0.9 + 0.1 * current_lane) + 2,
+	vector<double> next_wp0 = getXY(car_s + previous_path_length + ref_v * 0.5, 4 * (target_lane* 0.9 + 0.1 * current_lane) + 2,
 		map_waypoints_s, map_waypoints_x,map_waypoints_y);
 	vector<double> next_wp1 = getXY(car_s + previous_path_length + ref_v * 2, 4 * target_lane + 2, 
 		map_waypoints_s, map_waypoints_x,map_waypoints_y);
@@ -439,7 +448,7 @@ double behaviorControl(
 	}
 	else if (ref_v < 49.0)
 	{
-		ref_v += 0.225;
+		ref_v += 0.25;
 		cout << " speed up ref_v to " << ref_v << endl;
 	}
 
