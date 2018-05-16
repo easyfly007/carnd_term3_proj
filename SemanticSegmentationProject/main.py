@@ -46,6 +46,9 @@ def load_vgg(sess, vgg_path):
 
     if dbg:
     	print('vgg_input shape = ', vgg_input.shape)
+        print('vgg_layer3_out shape = ', vgg_layer3_out.shape)
+        print('vgg_layer4_out shape = ', vgg_layer4_out.shape)
+        print('vgg_layer7_out shape = ', vgg_layer7_out.shape)
     return vgg_input, vgg_keepprob, vgg_layer3_out, vgg_layer4_out, vgg_layer7_out
 tests.test_load_vgg(load_vgg, tf)
 
