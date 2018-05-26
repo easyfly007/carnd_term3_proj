@@ -1,0 +1,12 @@
+# set all the env and other things
+>> source /opt/ros/kinetic/setup.bash
+
+# to check the env
+>> env
+
+# 开启主进程 master process
+>> roscore
+
+# start turtlesim
+# rosrun <package> <executable_node>
+>> rosrun turtlesim turtlesim_node
