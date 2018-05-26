@@ -58,3 +58,58 @@ Vector3 angular
 # echo topic
 >> rostopic echo /turtle1/cmd_vel
 # dynamically print the topic information
+
+
+
+# catkin 包管理工具
+1. create catkin work space
+
+>> mkdir -p ~/catkin_ws/src
+>> cd ~/catkin_ws/src
+>> catkin_init_workspace
+>> ls -l
+	* CMakeLists.txt linked to /opt/ros/kinetic/share/catkin/cmake/toplevel.cmake
+>> cd ~/catkin_ws
+>> catkin_make
+>> ls 
+	* build/ devel/ src/
+
+2. add a package
+>> cd ~/catkin_ws/src
+>> git clone https://github.com/udacity/simple_arm_01.git simple_arm
+	# here we use git clone
+>> cd ~/catkin_ws
+>> catkin_make
+	# to fix make error, need to install some dependency package
+	>> sudo apt-get install ros-kinetic-controller-manager
+	>> source devel/setup.bash
+	>> rosdep install simple_arm
+	>> catkin_make
+
+3. roslaunch nodes use command, use one command to launch many nodes
+>> source devel/setup.bash
+>> roslaunch simple_arm robot_spawn.launch
+>> rosdep check simple_arm
+	# check all dependency
+	>> rosdep install -i simple_arm
+
+4. dive deep into package
+>> cd ~/catkin_ws/src
+>> catkin_create_pkg <your_package_name> [dependency1 dependency2 ...]
+>> catkin_create_pkg first_package
+
+
+# writing ROS nodes
+
+1. what have done?
+	1.1 create catkin workspace
+	1.2 added simple_arm package
+	2.3 TODO: 
+		create a simple_mover node, which will send the joint angle to the simple_arm
+	2.4 TODO:
+		create a arm_mover node, which provide a service save_move
+		allow the simple_arm to be moved to any safe location
+	2.5 TODO:
+		create a look away_node, subscribe the camera data topic
+		when the camera image is blank, it's looking at the sky and we can invoke the save_movere server to move the simple_arm to a new position
+		
