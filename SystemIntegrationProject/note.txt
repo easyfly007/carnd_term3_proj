@@ -10,3 +10,51 @@
 # start turtlesim
 # rosrun <package> <executable_node>
 >> rosrun turtlesim turtlesim_node
+
+# start turtle teleoperation node
+>> rosun turtlesim turtle_teleop_key
+
+# list information
+# check out all the running node
+>> rosnode list
+* rosout # the master will use it to write log
+* teleop_turtle
+* turtlesim
+
+# checkout all the topics
+>> rostopic list
+/rosout
+/rosout_agg
+/turtle1/cmd_vel
+/turtle1/color_sensor
+/turtle1/pose
+
+# get topic info
+>> rostopic info /turtle1/cmd_vel
+* publishers:
+	/teleop_turtle (http://tp:39121/)
+* subscribers
+	/turtlesim (http://tp:39549)
+
+# get message info
+>> rosmsg show geometry_msgs/Twist
+geometry_msgs/Vector3 linear
+	float64 x
+	float64 y
+	float64 z
+geometry_msgs/Vector3 angular
+	float64 x
+	float64 y
+	float64 z
+
+# edit the file
+>> rosed geometry_msgs Twist.msg
+```
+# this expresses velocity in free space broken into its linear and angular parts
+Vector3 Linear
+Vector3 angular
+```
+
+# echo topic
+>> rostopic echo /turtle1/cmd_vel
+# dynamically print the topic information
