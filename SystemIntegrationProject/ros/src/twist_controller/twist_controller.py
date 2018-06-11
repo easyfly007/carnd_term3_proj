@@ -13,8 +13,9 @@ class Controller(object):
 	
 		self.yaw_controller = YawController(wheel_base, steer_ratio, 0.1, max_lat_accel, max_steer_angle)
 		kp = 0.3
-		ki = 0.1
-		kd = 0.
+		ki = 0.001
+		kd = 0.05
+
 		mn = 0.0 # minimum throttle val
 		mx = 0.2 # max throttle val
 		self.throttle_controller = PID(kp, ki, kd, mn, mx)
@@ -30,18 +31,16 @@ class Controller(object):
 		self.accel_limit = accel_limit
 		self.wheel_radius = wheel_radius
 		self.last_time = rospy.get_time()
-        # TODO: Implement
-        pass
 
-    def control(self, current_vel, dbw_enabled, linear_vel, angular_vel):
-        # TODO: Change the arg, kwarg list to suit your needs
-        # Return throttle, brake, steer
+	def control(self, current_vel, dbw_enabled, linear_vel, angular_vel):
+		# TODO: Change the arg, kwarg list to suit your needs
+		# Return throttle, brake, steer
 
-        if not dbw_enabled:
-        	self.throttle_controller.reset()
-        	return 0., 0., 0.
+		if not dbw_enabled:
+			self.throttle_controller.reset()
+			return 0., 0., 0.
 
-        current_vel = self.vel_lpf.filt(current_vel)
+		current_vel = self.vel_lpf.filt(current_vel)
 
 		# rospy.logwarn("Angular vel: {0}".format(angular_vel))
 		# rospy.logwarn("Target velocity: {0}".format(linear_vel))
